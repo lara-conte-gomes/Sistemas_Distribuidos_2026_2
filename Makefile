@@ -1,14 +1,16 @@
 .PHONY: install run test lint clean
 
-PYTEST := poetry run pytest
-UVICORN := poetry run uvicorn
-RUFF := poetry run ruff
+BACKEND := backend
+POETRY := poetry run
+PYTEST := $(POETRY) pytest
+UVICORN := $(POETRY) uvicorn
+RUFF := $(POETRY) ruff
 
 help:
 	@echo "Lista de Comandos:"
 	@echo "  make install  - instala as dependências"
 	@echo "  make run      - inicia o servidor"
-	@echo "  make test     - executa testes com pytest"
+	@echo "  make test     - entra na pasta backend e executa testes com pytest"
 	@echo "  make lint     - verifica o código"
 	@echo "  make clean    - realiza limpeza de cache"
 
@@ -19,7 +21,7 @@ run:
 	$(UVICORN) app.main:app --reload
 
 test:
-	$(PYTEST)
+	@cd $(BACKEND) && $(PYTEST)
 
 lint:
 	$(RUFF) check .
