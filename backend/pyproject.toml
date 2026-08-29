@@ -1,0 +1,28 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = "Projeto voltado para a aplicação dos aprendizados das aulas de laboratório da disciplina de C216-L1 (Sistemas Distribuídos) - Criado por Lara Conte Gomes, aluna da P10 de Engenharia de Computação"
+authors = [
+    {name = "lara-conte-gomes",email = "lara.lc@gec.inatel.br"}
+]
+license = "MIT"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi (>=0.141.1,<0.142.0)",
+    "uvicorn (>=0.52.3,<0.53.0)"
+]
+
+[tool.poetry]
+package-mode = false
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.1.1,<10.0.0)",
+    "httpx (>=0.28.1,<0.29.0)",
+    "ruff (>=0.16.3,<0.17.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
