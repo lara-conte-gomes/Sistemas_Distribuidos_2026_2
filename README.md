@@ -91,7 +91,7 @@ Iniciou-se a adição de testes para o arquivo main.py. Os testes estão present
 
 Por último, foram adicionados mais comandos no MakeFile, como por exemplo:
 
-Execução os testes mostrando mais detalhes no terminal:
+Execução dos testes mostrando mais detalhes no terminal:
 
 - make test-verbose
 
