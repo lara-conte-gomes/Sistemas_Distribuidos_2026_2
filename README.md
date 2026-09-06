@@ -84,7 +84,7 @@ E encerrar os containers:
 
 - make down
 
-# Atividade Prática 3 - testes com Pytest
+# Atividade Prática 3 - testes com Pytest e Integração Contínua
 
 Iniciou-se a adição de testes para o arquivo main.py. Os testes estão presentes em 
 `/backend/tests/test_main.py`. Também criou-se o arquivo de execução do CI que irá realizar o workflow em 'push' e 'pull_request'.
