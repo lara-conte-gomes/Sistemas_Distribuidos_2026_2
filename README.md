@@ -84,23 +84,54 @@ E encerrar os containers:
 
 - make down
 
+# Atividade Prática 3 - testes com Pytest e Integração Contínua
+
+Iniciou-se a adição de testes para o arquivo main.py. Os testes estão presentes em 
+`/backend/tests/test_main.py`. Também criou-se o arquivo de execução do CI que irá realizar o workflow em 'push' e 'pull_request'.
+
+Por último, foram adicionados mais comandos no MakeFile, como por exemplo:
+
+Execução dos testes mostrando mais detalhes no terminal:
+
+- make test-verbose
+
+Verificação de correções de formatação no código:
+
+- make format-check
+
+Correção de problemas de lint:
+
+- make lint-fix
+
+Para a execução dos testes, rode _make test_, e para a execução do CI _make ci_. Ambos na raiz do projeto.
+
 # Estrutura do projeto até o momento
 
 ```text
 Sistemas_Distribuidos_2026_2/
 │
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+│
 ├── backend/
 │   ├── app/
+│   │   ├── __init__.py
 │   │   └── main.py
-│   ├── Dockerfile
+│   │
+│   ├── tests/
+│   │   └── test_main.py
+│   │
 │   ├── .dockerignore
-│   ├── pyproject.toml
-│   └── poetry.lock
+│   ├── Dockerfile
+│   ├── poetry.lock
+│   └── pyproject.toml
 │
 ├── frontend/
 │   └── (a ser desenvolvido)
 │
-├── compose.yaml
-├── Makefile
 ├── .gitignore
+├── compose.yaml
+├── LICENSE
+├── Makefile
 └── README.md
