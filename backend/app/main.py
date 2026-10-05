@@ -1,27 +1,11 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
+
+from app.api.routes.items import router as items_router
+from app.api.routes.message_check import router as message_router
+from app.api.routes.users import router as users_router
 
 app = FastAPI()
 
-
-class User(BaseModel):
-    name: str
-    age: int
-
-
-users = []
-
-
-@app.get("/")
-def root():
-    return {"message": "Laboratório de Sistemas Distribuídos funcionando!"}
-
-
-@app.get("/health")
-def health_check():
-    return {"status": "ok"}
-
-
-@app.get("/users")
-def get_users():
-    return users
+app.include_router(users_router)
+app.include_router(items_router)
+app.include_router(message_router)
