@@ -95,6 +95,10 @@ Execução dos testes mostrando mais detalhes no terminal:
 
 - make test-verbose
 
+Verificação de correções de formatação no código e correção automática:
+
+- make format
+
 Verificação de correções de formatação no código:
 
 - make format-check
@@ -105,7 +109,99 @@ Correção de problemas de lint:
 
 Para a execução dos testes, rode _make test_, e para a execução do CI _make ci_. Ambos na raiz do projeto.
 
-# Estrutura do projeto até o momento
+## Atividade Prática 4 - Rotas, Schemas, Services e Testes Unitários e de Integração
+
+Na Prática 4, separou-se e acresentou-se rotas que estavam na main.py para a pasta routes e começou-se a separar as responsabilidades entre schemas e services também.
+
+### Routes
+
+As rotas ficam responsáveis pela interface HTTP da API e estão localizadas em:
+
+```text
+backend/app/api/routes/
+```
+
+Foram implementadas rotas para os recursos de usuários (funcionários) e itens utilizando os métodos HTTP listados abaixo:
+
+- `GET` — consulta de recursos;
+- `POST` — criação de recursos;
+- `PUT` — atualização completa;
+- `PATCH` — atualização parcial;
+- `DELETE` — remoção de recursos.
+
+Também foram utilizadas rotas com Path Parameters para a identificação de usuários e itens.
+
+### Schemas
+
+Os schemas estão localizados em:
+
+```text
+backend/app/schemas/
+```
+
+São utilizados modelos Pydantic para definir e validar os dados recebidos pela API.
+
+### Services
+
+É onde a lógica da aplicação se encontra. Está armazenado em:
+
+```text
+backend/app/services/
+```
+
+Os services são responsáveis pelas operações relacionadas aos usuários e itens, enquanto as rotas ficam responsáveis pelo tratamento das requisições e respostas HTTP.
+
+## Testes Unitários e de Integração
+
+Os testes foram separados em duas categorias: Unitários e Integração. Maiores detalhes abaixo:
+
+### Testes Unitários
+
+Localizados em:
+
+```text
+backend/tests/unit/
+```
+
+Testam diretamente os services da aplicação, verificando a lógica de usuários e itens isoladamente.
+
+### Testes de Integração
+
+Localizados em:
+
+```text
+backend/tests/integration/
+```
+
+Utilizam o `TestClient` do FastAPI para testar o funcionamento integrado das rotas da aplicação.
+
+Os testes de integração verificam os endpoints `GET`, `POST`, `PUT`, `PATCH` e `DELETE`, além dos códigos de status HTTP e dos dados que são retornados pela API.
+
+Para executar toda a suíte de testes dê o seguinte comando abaixo:
+
+```bash
+make test
+```
+
+Ou, com saída mais detalhada:
+
+```bash
+make test-verbose
+```
+
+## Verificação Antes do Commit
+
+Antes de realizar um commit, as verificações podem ser executadas na seguinte sequência:
+
+```bash
+make format
+make lint-fix
+make ci
+```
+
+O comando `make ci` verifica a formatação, executa o lint e roda os testes automatizados, de forma sequencial.
+
+## Estrutura do projeto até o momento
 
 ```text
 Sistemas_Distribuidos_2026_2/
@@ -116,10 +212,36 @@ Sistemas_Distribuidos_2026_2/
 │
 ├── backend/
 │   ├── app/
+│   │   ├── api/
+│   │   │   └── routes/
+│   │   │       ├── __init__.py
+│   │   │       ├── items.py
+│   │   │       ├── message_check.py
+│   │   │       └── users.py
+│   │   │
+│   │   ├── schemas/
+│   │   │   ├── __init__.py
+│   │   │   ├── item.py
+│   │   │   └── user.py
+│   │   │
+│   │   ├── services/
+│   │   │   ├── __init__.py
+│   │   │   ├── item_service.py
+│   │   │   └── user_service.py
+│   │   │
 │   │   ├── __init__.py
 │   │   └── main.py
 │   │
 │   ├── tests/
+│   │   ├── integration/
+│   │   │   ├── test_items.py
+│   │   │   ├── test_message_check.py
+│   │   │   └── test_users.py
+│   │   │
+│   │   ├── unit/
+│   │   │   ├── test_item_service.py
+│   │   │   └── test_user_service.py
+│   │   │
 │   │   └── test_main.py
 │   │
 │   ├── .dockerignore
@@ -128,10 +250,10 @@ Sistemas_Distribuidos_2026_2/
 │   └── pyproject.toml
 │
 ├── frontend/
-│   └── (a ser desenvolvido)
 │
 ├── .gitignore
 ├── compose.yaml
 ├── LICENSE
 ├── Makefile
 └── README.md
+```

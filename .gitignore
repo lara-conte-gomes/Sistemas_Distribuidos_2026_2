@@ -1,6 +1,17 @@
-#Python
+# Python
+__pycache__/
+*.py[cod]
+
+# Pytest
 .pytest_cache/
 
-#Ambiente virtual
-.env
+# Ruff
+.ruff_cache/
 
+# Ambiente virtual
+.venv/
+venv/
+
+# Variáveis de ambiente
+.env
+.env.*

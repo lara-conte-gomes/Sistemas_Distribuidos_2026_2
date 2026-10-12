@@ -14,6 +14,7 @@ help:
 	@echo " make test     - entra na pasta backend e executa testes com pytest"
 	@echo " make test-verbose     - entra na pasta backend e executa testes com pytest mostrando mais detalhes"
 	@echo " make lint     - verifica o codigo"
+	@echo " make format	  - verifica a formatacao do codigo e corrige ela"
 	@echo " make format-check     - verifica a formatacao do codigo"
 	@echo " make lint-fix     - corrige problemas de lint"
 	@echo " make ci     - executa a Integração Contínua de format-check, lint e test"
@@ -41,6 +42,9 @@ test-verbose:
 
 lint:
 	@cd $(BACKEND) && $(RUFF) check .
+
+format:
+	@cd $(BACKEND) && $(RUFF) format .
 
 format-check:
 	@cd $(BACKEND) && $(RUFF) format --check .
