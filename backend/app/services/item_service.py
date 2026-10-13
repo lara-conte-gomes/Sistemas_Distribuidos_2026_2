@@ -5,6 +5,7 @@ from app.schemas.item import CreateItem, ItemPatch, ItemUpdate
 
 # Implementando agora com ligação com repositories
 
+
 # Ver a lista de itens
 def list_items(db: Session):
     return item_repository.list_items(db)

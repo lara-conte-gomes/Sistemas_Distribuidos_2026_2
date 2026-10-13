@@ -26,7 +26,7 @@ def get_item(item_id: int, db: DbSession):
     if item is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Item não foi encontrado",
+            detail="Item não encontrado",
         )
 
     return item
@@ -54,7 +54,7 @@ def update_item(
     if updated_item is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Item não foi encontrado",
+            detail="Item não encontrado",
         )
 
     return updated_item
@@ -72,7 +72,7 @@ def partial_update_item(
     if updated_item is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Item não foi encontrado",
+            detail="Item não encontrado",
         )
 
     return updated_item
@@ -86,7 +86,7 @@ def delete_item(item_id: int, db: DbSession):
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Item não foi encontrado",
+            detail="Item não encontrado",
         )
 
-    return {"message": "Item foi removido"}
+    return {"message": "Item removido"}
