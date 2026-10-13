@@ -201,6 +201,163 @@ make ci
 
 O comando `make ci` verifica a formatação, executa o lint e roda os testes automatizados, de forma sequencial.
 
+## Atividade Prática 5 - Persistência de Dados com PostgreSQL, SQLAlchemy e Alembic
+
+Na Prática 5, foi implementada a parte de persistência dos dados da aplicação com a utilização de banco de dados relacional PostgreSQL, executado por meio do Docker Compose.
+
+Anteriormente, os usuários e itens eram armazenados em listas Python, fazendo com que os dados fossem perdidos ao reiniciar a aplicação. Com a integração ao PostgreSQL, os registros agora passaram a ser armazenados de forma mais persistente.
+
+Também foi realizada uma reorganização da arquitetura do backend, separando as responsabilidades entre as seguintes pastas: Routes, Schemas, Services, Repositories e Models.
+
+### PostgreSQL e Docker Compose
+
+O PostgreSQL foi adicionado ao arquivo compose.yaml, permitindo a execução conjunta da API FastAPI e do banco de dados.
+
+A comunicação entre os serviços está sendo realizada pela rede interna do Docker Compose, utilizando o nome db como endereço do servidor PostgreSQL.
+
+A configuração da conexão está utilizando a variável de ambiente DATABASE_URL, definida em:
+
+`backend/app/core/config.py`
+
+A criação das sessões do SQLAlchemy está implementada em:
+
+`backend/app/database/session.py`
+
+Para iniciar os containers, execute na raiz do projeto o seguinte comando:
+
+```bash
+make up
+```
+
+Para reconstruir as imagens e iniciar os containers:
+
+```bash
+make rebuild
+```
+
+### SQLAlchemy e Models
+
+O SQLAlchemy foi utilizado para realizar o mapeamento objeto-relacional (ORM), permitindo a representação das tabelas do PostgreSQL por meio de classes do Python.
+
+Os modelos estão localizados em:
+
+`backend/app/models/`
+
+Foram implementados dois modelos:
+
+- Item: representa os itens cadastrados, contendo id, name e quantity.
+
+- User: representa os usuários cadastrados, contendo id, name e age.
+
+Cada registro possui um identificador único, utilizado nas operações de consulta, atualização e exclusão do banco de dados.
+
+### Repositories
+
+Foi adicionada uma camada de persistência responsável pela comunicação com o banco de dados.
+
+Os repositories estão localizados em:
+
+`backend/app/repositories/`
+
+Foram implementados:
+
+- item.py: operações de consulta, criação, atualização e exclusão de itens.
+
+- user.py: operações de consulta, criação, atualização e exclusão de usuários.
+
+Essa separação permite que os services utilizem os repositories sem executar diretamente as operações SQLAlchemy.
+
+### Services e Routes
+
+Os services foram atualizados para a utilização dos repositories e recepção das sessões do banco de dados.
+
+As rotas FastAPI passaram a utilizar injeção de dependências com Depends e Annotated, permitindo fornecer uma sessão do SQLAlchemy para cada requisição criada.
+
+Os recursos users e items possuem operações CRUD por meio dos métodos HTTP GET, POST, PUT, PATCH e DELETE.
+
+### Alembic e Migrations
+
+O Alembic foi configurado para gerenciar as alterações na estrutura do banco de dados.
+
+Seus arquivos estão localizados em:
+
+`backend/alembic/`
+`backend/alembic.ini`
+
+Foram criadas migrations para as tabelas items e users.
+
+Para aplicar as migrations pendentes, utilize o comando abaixo:
+
+```bash
+make db-upgrade
+```
+
+Para consultar a versão atual do banco:
+
+```bash
+make db-current
+```
+Para visualizar o histórico:
+
+```bash
+make db-history
+```
+
+Para gerar uma nova migration, utilize o comando make db-revision, conforme a configuração que está presente no Makefile.
+
+### Testes Unitários e de Integração
+
+Os testes automatizados foram adaptados à nova arquitetura com banco de dados.
+
+Os testes unitários utilizam MagicMock e patch.object para simular as operações dos repositories, verificando o comportamento dos services sem acessar o banco de dados.
+
+Os testes de integração utilizam o TestClient do FastAPI e um banco SQLite temporário em memória, configurado no arquivo:
+
+`backend/tests/integration/conftest.py`
+
+Esse banco é criado e descartado durante os testes, evitando alterações nos dados do PostgreSQL.
+
+Para executar os testes, utilize o comando abaixo:
+
+```bash
+make test
+```
+
+Para verificar a qualidade e a formatação do código:
+
+```bash
+make lint
+make format-check
+```
+
+### Verificação da Persistência
+
+A persistência dos dados foi validada por meio do Swagger UI do FastAPI, disponível em:
+
+`http://localhost:8000/docs`
+
+Foram cadastrados registros de usuários e itens utilizando os seguintes endpoints: POST /users/ e POST /items/.
+
+Após reiniciar os containers com o comando:
+
+```bash
+docker compose restart
+```
+
+Os registros permaneceram disponíveis nas consultas GET /users/ e GET /items/, confirmando a persistência dos dados no PostgreSQL.
+
+### Configuração das Variáveis de Ambiente
+
+Foi adicionado um arquivo `.env` a fim de centralizar as configurações de conexão com o PostgreSQL, incluindo o nome do banco, usuário, senha e URL da conexão.
+
+O Docker Compose faz uso essas variáveis para configurar os serviços da aplicação e do banco de dados.
+
+O arquivo `.env` não é versionado no Git, evitando a exposição de credenciais. Para facilitar a configuração do ambiente, foi criado um arquivo `.env.example` contendo as variáveis necessárias para as configurações.
+
+Antes de iniciar a aplicação, deve-se copiar o arquivo `.env.example` para `.env` e ajustar os valores conforme o ambiente utilizado de cada pessoa.
+
+A aplicação acessa a variável `DATABASE_URL` por meio do arquivo `backend/app/core/config.py`.
+
 ## Estrutura do projeto até o momento
 
 ```text
@@ -211,6 +368,12 @@ Sistemas_Distribuidos_2026_2/
 │       └── ci.yml
 │
 ├── backend/
+│   ├── alembic/
+│   │   ├── versions/
+│   │   │   ├── ..._create_items_table.py
+│   │   │   └── ..._create_users_table.py
+│   │   └── env.py
+│   │
 │   ├── app/
 │   │   ├── api/
 │   │   │   └── routes/
@@ -219,13 +382,26 @@ Sistemas_Distribuidos_2026_2/
 │   │   │       ├── message_check.py
 │   │   │       └── users.py
 │   │   │
+│   │   ├── core/
+│   │   │   └── config.py
+│   │   │
+│   │   ├── database/
+│   │   │   ├── base.py
+│   │   │   └── session.py
+│   │   │
+│   │   ├── models/
+│   │   │   ├── item.py
+│   │   │   └── user.py
+│   │   │
+│   │   ├── repositories/
+│   │   │   ├── item.py
+│   │   │   └── user.py
+│   │   │
 │   │   ├── schemas/
-│   │   │   ├── __init__.py
 │   │   │   ├── item.py
 │   │   │   └── user.py
 │   │   │
 │   │   ├── services/
-│   │   │   ├── __init__.py
 │   │   │   ├── item_service.py
 │   │   │   └── user_service.py
 │   │   │
@@ -234,6 +410,7 @@ Sistemas_Distribuidos_2026_2/
 │   │
 │   ├── tests/
 │   │   ├── integration/
+│   │   │   ├── conftest.py
 │   │   │   ├── test_items.py
 │   │   │   ├── test_message_check.py
 │   │   │   └── test_users.py
@@ -245,12 +422,14 @@ Sistemas_Distribuidos_2026_2/
 │   │   └── test_main.py
 │   │
 │   ├── .dockerignore
+│   ├── alembic.ini
 │   ├── Dockerfile
 │   ├── poetry.lock
 │   └── pyproject.toml
 │
 ├── frontend/
 │
+├── .env.example
 ├── .gitignore
 ├── compose.yaml
 ├── LICENSE

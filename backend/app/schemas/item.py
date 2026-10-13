@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class CreateItem(BaseModel):
@@ -14,3 +14,11 @@ class ItemUpdate(BaseModel):
 class ItemPatch(BaseModel):
     name: str | None = None
     quantity: int | None = None
+
+
+class ItemResponse(BaseModel):
+    id: int
+    name: str
+    quantity: int
+
+    model_config = ConfigDict(from_attributes=True)

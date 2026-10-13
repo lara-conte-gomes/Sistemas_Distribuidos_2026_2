@@ -1,62 +1,47 @@
-items = [{"name": "notebook", "quantity": 50}]
+from sqlalchemy.orm import Session
+
+from app.repositories import item as item_repository
+from app.schemas.item import CreateItem, ItemPatch, ItemUpdate
+
+# Implementando agora com ligação com repositories
+
+# Ver a lista de itens
+def list_items(db: Session):
+    return item_repository.list_items(db)
 
 
-# Retornar lista de items
-def list_items():
-    return items
+# Buscando um item
+def get_item(db: Session, item_id: int):
+    return item_repository.get_item(db, item_id)
 
 
-# Função para buscar algum item
-def get_item(item_name: str):
-    for x in items:
-        if x["name"] == item_name:
-            return x
-
-    return None
-
-
-# Função para criar um item
-def create_item(item):
-    new_item = item.model_dump()  # Conversão para dicionário
-    items.append(new_item)  # Adicionando na lista
-
-    return new_item
+# Criando um item
+def create_item(db: Session, item: CreateItem):
+    return item_repository.create_item(
+        db,
+        name=item.name,
+        quantity=item.quantity,
+    )
 
 
-# Função para atualizar um item
-def update_item(item_name: str, item):
-    for x in items:
-        if x["name"] == item_name:
-            x["name"] = item.name
-            x["quantity"] = item.quantity
-
-            return x
-
-    return None
+# Atualizando um item
+def update_item(db: Session, item_id: int, item: ItemUpdate):
+    return item_repository.update_item(
+        db,
+        item_id,
+        item.model_dump(),
+    )
 
 
-# Função para atualizar parcialmente um item
-def partial_update_item(item_name: str, item):
-    for x in items:
-        if x["name"] == item_name:
-            # Verificação se quero atualizar nome do item
-            if item.name is not None:
-                x["name"] = item.name
-
-            # Verificação se quero atualizar a quantidade do item
-            if item.quantity is not None:
-                x["quantity"] = item.quantity
-
-            return x
-
-    return None
+# Atualização parcial de um item
+def partial_update_item(db: Session, item_id: int, item: ItemPatch):
+    return item_repository.update_item(
+        db,
+        item_id,
+        item.model_dump(exclude_unset=True),
+    )
 
 
-# Função para deletar um item
-def delete_item(item_name: str):
-    for x in items:
-        if x["name"] == item_name:
-            items.remove(x)
-            return True
-
-    return False
+# Deletando um item
+def delete_item(db: Session, item_id: int):
+    return item_repository.delete_item(db, item_id)

@@ -1,118 +1,182 @@
+from unittest.mock import MagicMock, patch
+
 from app.schemas.item import CreateItem, ItemPatch, ItemUpdate
 from app.services import item_service
 
 
-def setup_function():
-    item_service.items.clear()
-    item_service.items.append({"name": "notebook", "quantity": 50})
-
-
-# Teste de listagem de itens
+# Teste de listagem dos itens
 def test_list_items():
-    items = item_service.list_items()
+    db = MagicMock()
+    expected_items = [{"id": 1, "name": "notebook", "quantity": 50}]
 
-    assert len(items) == 1
-    assert items[0] == {
-        "name": "notebook",
-        "quantity": 50,
-    }
+    with patch.object(
+        item_service.item_repository,
+        "list_items",
+        return_value=expected_items,
+    ) as mock_repository:
+        result = item_service.list_items(db)
+
+    assert result == expected_items
+    mock_repository.assert_called_once_with(db)
 
 
 # Teste de busca de um item
 def test_get_item():
-    item = item_service.get_item("notebook")
-
-    assert item is not None
-    assert item == {
+    db = MagicMock()
+    expected_item = {
+        "id": 1,
         "name": "notebook",
         "quantity": 50,
     }
 
+    with patch.object(
+        item_service.item_repository,
+        "get_item",
+        return_value=expected_item,
+    ) as mock_repository:
+        result = item_service.get_item(db, 1)
 
-# Teste de busca de um item inexistente
+    assert result == expected_item
+    mock_repository.assert_called_once_with(db, 1)
+
+
+# Teste de item inexistente
 def test_get_item_not_found():
-    item = item_service.get_item("mouse")
+    db = MagicMock()
 
-    assert item is None
+    with patch.object(
+        item_service.item_repository,
+        "get_item",
+        return_value=None,
+    ):
+        result = item_service.get_item(db, 999)
+
+    assert result is None
 
 
 # Teste de criação de um item
 def test_create_item():
-    item = CreateItem(
-        name="mouse",
-        quantity=20,
-    )
+    db = MagicMock()
+    item = CreateItem(name="mouse", quantity=20)
 
-    created_item = item_service.create_item(item)
-
-    assert created_item == {
+    expected_item = {
+        "id": 1,
         "name": "mouse",
         "quantity": 20,
     }
 
-    assert len(item_service.items) == 2
+    with patch.object(
+        item_service.item_repository,
+        "create_item",
+        return_value=expected_item,
+    ) as mock_repository:
+        result = item_service.create_item(db, item)
 
+    assert result == expected_item
 
-# Teste de atualização completa de um item
-def test_update_item():
-    item = ItemUpdate(
-        name="notebook-gamer",
-        quantity=30,
-    )
-
-    updated_item = item_service.update_item(
-        "notebook",
-        item,
-    )
-
-    assert updated_item == {
-        "name": "notebook-gamer",
-        "quantity": 30,
-    }
-
-
-# Teste de atualização completa de um item inexistente
-def test_update_item_not_found():
-    item = ItemUpdate(
+    mock_repository.assert_called_once_with(
+        db,
         name="mouse",
         quantity=20,
     )
 
-    updated_item = item_service.update_item(
-        "teclado",
-        item,
+
+# Teste de atualização completa de um item
+def test_update_item():
+    db = MagicMock()
+    item = ItemUpdate(name="notebook-gamer", quantity=30)
+
+    expected_item = {
+        "id": 1,
+        "name": "notebook-gamer",
+        "quantity": 30,
+    }
+
+    with patch.object(
+        item_service.item_repository,
+        "update_item",
+        return_value=expected_item,
+    ) as mock_repository:
+        result = item_service.update_item(db, 1, item)
+
+    assert result == expected_item
+
+    mock_repository.assert_called_once_with(
+        db,
+        1,
+        {
+            "name": "notebook-gamer",
+            "quantity": 30,
+        },
     )
 
-    assert updated_item is None
+
+# Teste de atualização de item inexistente
+def test_update_item_not_found():
+    db = MagicMock()
+    item = ItemUpdate(name="mouse", quantity=10)
+
+    with patch.object(
+        item_service.item_repository,
+        "update_item",
+        return_value=None,
+    ):
+        result = item_service.update_item(db, 999, item)
+
+    assert result is None
 
 
 # Teste de atualização parcial de um item
 def test_partial_update_item():
-    item = ItemPatch(
-        quantity=25,
-    )
+    db = MagicMock()
+    item = ItemPatch(quantity=25)
 
-    updated_item = item_service.partial_update_item(
-        "notebook",
-        item,
-    )
-
-    assert updated_item == {
+    expected_item = {
+        "id": 1,
         "name": "notebook",
         "quantity": 25,
     }
 
+    with patch.object(
+        item_service.item_repository,
+        "update_item",
+        return_value=expected_item,
+    ) as mock_repository:
+        result = item_service.partial_update_item(db, 1, item)
+
+    assert result == expected_item
+
+    mock_repository.assert_called_once_with(
+        db,
+        1,
+        {"quantity": 25},
+    )
+
 
 # Teste de remoção de um item
 def test_delete_item():
-    deleted = item_service.delete_item("notebook")
+    db = MagicMock()
 
-    assert deleted is True
-    assert len(item_service.items) == 0
+    with patch.object(
+        item_service.item_repository,
+        "delete_item",
+        return_value=True,
+    ) as mock_repository:
+        result = item_service.delete_item(db, 1)
+
+    assert result is True
+    mock_repository.assert_called_once_with(db, 1)
 
 
-# Teste de remoção de um item inexistente
+# Teste de remoção de item inexistente
 def test_delete_item_not_found():
-    deleted = item_service.delete_item("mouse")
+    db = MagicMock()
 
-    assert deleted is False
+    with patch.object(
+        item_service.item_repository,
+        "delete_item",
+        return_value=False,
+    ):
+        result = item_service.delete_item(db, 999)
+
+    assert result is False
