@@ -1,17 +1,43 @@
 # Python
 __pycache__/
 *.py[cod]
+*.pyo
 
-# Pytest
+# Pytest e cobertura de testes
 .pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
 
 # Ruff
 .ruff_cache/
 
-# Ambiente virtual
+# Ambientes virtuais
 .venv/
 venv/
+env/
 
-# Variáveis de ambiente
+# Variáveis de ambiente e credenciais
 .env
 .env.*
+!.env.example
+
+# Arquivos locais de banco de dados
+*.db
+*.sqlite
+*.sqlite3
+
+# Docker
+docker-compose.override.yml
+
+# IDE e sistema operacional
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Arquivos temporários
+*.log
+*.tmp
+*.bak

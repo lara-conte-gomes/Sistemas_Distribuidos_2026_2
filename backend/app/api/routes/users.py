@@ -1,23 +1,28 @@
-from fastapi import APIRouter, HTTPException, status
+from typing import Annotated
 
-from app.schemas.user import User, UserPatch, UserUpdate
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+
+from app.database.session import get_db
+from app.schemas.user import User, UserPatch, UserResponse, UserUpdate
 from app.services import user_service
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
-
-# Rota para mostrar a lista de usuários
-@router.get("/")
-def list_users():
-    return user_service.list_users()
+DbSession = Annotated[Session, Depends(get_db)]
 
 
-# Rota para buscar um usuário específico
-@router.get("/{user_name}")
-def get_user(user_name: str):
-    user = user_service.get_user(user_name)
+# Mstrar a lista de usuários
+@router.get("/", response_model=list[UserResponse])
+def list_users(db: DbSession):
+    return user_service.list_users(db)
 
-    # Exceção caso o usuário não existir
+
+# Buscar um usuário específico
+@router.get("/{user_id}", response_model=UserResponse)
+def get_user(user_id: int, db: DbSession):
+    user = user_service.get_user(db, user_id)
+
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -27,18 +32,25 @@ def get_user(user_name: str):
     return user
 
 
-# Rota para criar um usuário
-@router.post("/", status_code=status.HTTP_201_CREATED)
-def create_user(user: User):
-    return user_service.create_user(user)
+# Criar um usuário
+@router.post(
+    "/",
+    response_model=UserResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def create_user(user: User, db: DbSession):
+    return user_service.create_user(db, user)
 
 
-# Rota para atualizar completamente um usuário
-@router.put("/{user_name}")
-def update_user(user_name: str, user: UserUpdate):
-    updated_user = user_service.update_user(user_name, user)
+# Atualizar completamente um usuário
+@router.put("/{user_id}", response_model=UserResponse)
+def update_user(
+    user_id: int,
+    user: UserUpdate,
+    db: DbSession,
+):
+    updated_user = user_service.update_user(db, user_id, user)
 
-    # Exceção caso o usuário não existir
     if updated_user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -48,12 +60,15 @@ def update_user(user_name: str, user: UserUpdate):
     return updated_user
 
 
-# Rota para atualizar parcialmente um usuário
-@router.patch("/{user_name}")
-def partial_update_user(user_name: str, user: UserPatch):
-    updated_user = user_service.partial_update_user(user_name, user)
+# Atualizar parcialmente um usuário
+@router.patch("/{user_id}", response_model=UserResponse)
+def partial_update_user(
+    user_id: int,
+    user: UserPatch,
+    db: DbSession,
+):
+    updated_user = user_service.partial_update_user(db, user_id, user)
 
-    # Exceção caso o usuário não existir
     if updated_user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -63,12 +78,11 @@ def partial_update_user(user_name: str, user: UserPatch):
     return updated_user
 
 
-# Rota para deletar um usuário
-@router.delete("/{user_name}")
-def delete_user(user_name: str):
-    deleted = user_service.delete_user(user_name)
+# Deletar um usuário
+@router.delete("/{user_id}")
+def delete_user(user_id: int, db: DbSession):
+    deleted = user_service.delete_user(db, user_id)
 
-    # Exceção caso o usuário não existir
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

@@ -1,61 +1,46 @@
-users = [{"name": "Luíza", "age": 22}]
+from sqlalchemy.orm import Session
+
+from app.repositories import user as user_repository
+from app.schemas.user import User, UserPatch, UserUpdate
 
 
 # Retornar a lista de usuários
-def list_users():
-    return users
+def list_users(db: Session):
+    return user_repository.list_users(db)
 
 
 # Função para buscar um usuário
-def get_user(user_name: str):
-    for x in users:
-        if x["name"] == user_name:
-            return x
-
-    return None
+def get_user(db: Session, user_id: int):
+    return user_repository.get_user(db, user_id)
 
 
 # Função para criar um usuário
-def create_user(user):
-    new_user = user.model_dump()  # Conversão para dicionário
-    users.append(new_user)  # Adicionando na lista
+def create_user(db: Session, user: User):
+    return user_repository.create_user(
+        db,
+        name=user.name,
+        age=user.age,
+    )
 
-    return new_user
 
-
-# Função para atualizar um usuário
-def update_user(user_name: str, user):
-    for x in users:
-        if x["name"] == user_name:
-            x["name"] = user.name
-            x["age"] = user.age
-            return x
-
-    return None
+# Função para atualizar completamente um usuário
+def update_user(db: Session, user_id: int, user: UserUpdate):
+    return user_repository.update_user(
+        db,
+        user_id,
+        user.model_dump(),
+    )
 
 
 # Função para atualizar parcialmente um usuário
-def partial_update_user(user_name: str, user):
-    for x in users:
-        if x["name"] == user_name:
-            # Verificação se quero atualizar o nome do usuário
-            if user.name is not None:
-                x["name"] = user.name
-
-            # Verificação se quero atualizar a idade do usuário
-            if user.age is not None:
-                x["age"] = user.age
-
-            return x
-
-    return None
+def partial_update_user(db: Session, user_id: int, user: UserPatch):
+    return user_repository.update_user(
+        db,
+        user_id,
+        user.model_dump(exclude_unset=True),
+    )
 
 
 # Função para deletar um usuário
-def delete_user(user_name: str):
-    for x in users:
-        if x["name"] == user_name:
-            users.remove(x)
-            return True
-
-    return False
+def delete_user(db: Session, user_id: int):
+    return user_repository.delete_user(db, user_id)

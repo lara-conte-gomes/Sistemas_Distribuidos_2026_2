@@ -47,6 +47,9 @@ jobs:
     name: Pytest
     runs-on: ubuntu-latest
 
+    env:
+      DATABASE_URL: "sqlite+pysqlite:///:memory:"
+
     defaults:
       run:
         working-directory: backend

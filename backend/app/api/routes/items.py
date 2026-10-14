@@ -1,78 +1,92 @@
-from fastapi import APIRouter, HTTPException, status
+from typing import Annotated
 
-from app.schemas.item import CreateItem, ItemPatch, ItemUpdate
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+
+from app.database.session import get_db
+from app.schemas.item import CreateItem, ItemPatch, ItemResponse, ItemUpdate
 from app.services import item_service
 
 router = APIRouter(prefix="/items", tags=["Items"])
 
-
-# Rota para mostrar a lista de items
-@router.get("/")
-def list_items():
-    return item_service.list_items()
+DbSession = Annotated[Session, Depends(get_db)]
 
 
-# Rota para buscar um item
-@router.get("/{item_name}")
-def get_item(item_name: str):
-    item = item_service.get_item(item_name)
+# Mstrar a lista de items
+@router.get("/", response_model=list[ItemResponse])
+def list_items(db: DbSession):
+    return item_service.list_items(db)
 
-    # Exceção se o item não existir
+
+# Buscar um item específico
+@router.get("/{item_id}", response_model=ItemResponse)
+def get_item(item_id: int, db: DbSession):
+    item = item_service.get_item(db, item_id)
+
     if item is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Esse item não foi encontrado na lista",
+            detail="Item não encontrado",
         )
 
     return item
 
 
-# Rota para criar um item
-@router.post("/", status_code=status.HTTP_201_CREATED)
-def create_item(item: CreateItem):
-    return item_service.create_item(item)
+# Criar um item
+@router.post(
+    "/",
+    response_model=ItemResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def create_item(item: CreateItem, db: DbSession):
+    return item_service.create_item(db, item)
 
 
-# Rota para atualizar um item
-@router.put("/{item_name}")
-def update_item(item_name: str, item: ItemUpdate):
-    updated_item = item_service.update_item(item_name, item)
+# Atualizar completamente um item
+@router.put("/{item_id}", response_model=ItemResponse)
+def update_item(
+    item_id: int,
+    item: ItemUpdate,
+    db: DbSession,
+):
+    updated_item = item_service.update_item(db, item_id, item)
 
-    # Exceção se o item não existir
     if updated_item is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Esse item não foi encontrado",
+            detail="Item não encontrado",
         )
 
     return updated_item
 
 
-# Rota para atualização parcial do item
-@router.patch("/{item_name}")
-def partial_update_item(item_name: str, item: ItemPatch):
-    updated_item = item_service.partial_update_item(item_name, item)
+# Atualizar parcialmente um item
+@router.patch("/{item_id}", response_model=ItemResponse)
+def partial_update_item(
+    item_id: int,
+    item: ItemPatch,
+    db: DbSession,
+):
+    updated_item = item_service.partial_update_item(db, item_id, item)
 
-    # Exceção se o item não existir
     if updated_item is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Esse item não foi encontrado",
+            detail="Item não encontrado",
         )
 
     return updated_item
 
 
-# Rota para deletar um item
-@router.delete("/{item_name}")
-def delete_item(item_name: str):
-    deleted = item_service.delete_item(item_name)
+# Deletar um item
+@router.delete("/{item_id}")
+def delete_item(item_id: int, db: DbSession):
+    deleted = item_service.delete_item(db, item_id)
 
-    # Exceção se o item não existir
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Esse item não foi encontrado",
+            detail="Item não encontrado",
         )
 
-    return {"message": "O item foi removido"}
+    return {"message": "Item removido"}

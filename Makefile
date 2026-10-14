@@ -27,6 +27,15 @@ help:
 	@echo "	make logs-api - exibe os logs da API"
 	@echo "	make ps 	   - lista o status do container"
 	@echo "	make shell    - abre um terminal dentro do container da API"
+	@echo " make db-upgrade    - aplica as migrations pendentes"
+	@echo " make db-downgrade  - reverte a ultima migration"
+	@echo " make db-current    - mostra a migration atual"
+	@echo " make db-history    - exibe o historico de migrations"
+	@echo " make db-tables     - lista as tabelas do PostgreSQL"
+	@echo " make db-shell      - abre o terminal do PostgreSQL"
+	@echo " make db-revision MSG='descricao' - gera uma nova migration"
+	@echo " make db-setup      - inicia o Docker Compose e aplicar automaticamente as migrations"
+
 
 install:
 	@cd $(BACKEND) && poetry install
@@ -81,3 +90,33 @@ ps:
 
 shell:
 	$(DOCKER) exec api sh
+
+#Aplica todas as migrations pendentes
+db-upgrade:
+	docker compose exec api poetry run alembic upgrade head
+
+#Reverte a última migration aplicada
+db-downgrade:
+	docker compose exec api poetry run alembic downgrade -1
+
+db-current:
+	docker compose exec api poetry run alembic current
+
+db-history:
+	docker compose exec api poetry run alembic history
+
+db-tables:
+	docker compose exec db psql -U app -d app -c "\dt"
+
+db-shell:
+	docker compose exec db psql -U app -d app
+
+#Gera uma migration de forma automática
+#Exemplo: make db-revision MSG="create users table"
+db-revision:
+	@test -n "$(MSG)" || (echo "Informe MSG. Exemplo: make db-revision MSG='create users table'"; exit 1)
+	MSYS_NO_PATHCONV=1 docker compose run --rm -v "$(CURDIR)/backend/alembic:/app/alembic" api poetry run alembic revision --autogenerate -m "$(MSG)"
+
+setup-db:
+	docker compose up -d --build
+	docker compose exec api poetry run alembic upgrade head
