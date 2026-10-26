@@ -1,4 +1,5 @@
 .PHONY: install run test test-verbose lint format-check lint-fix ci clean up build rebuild down logs logs-api ps shell
+.PHONY: frontend-install frontend-dev frontend-lint frontend-format frontend-check frontend-test frontend-test-e2e frontend-build
 
 BACKEND := backend
 POETRY := poetry run
@@ -35,6 +36,14 @@ help:
 	@echo " make db-shell      - abre o terminal do PostgreSQL"
 	@echo " make db-revision MSG='descricao' - gera uma nova migration"
 	@echo " make db-setup      - inicia o Docker Compose e aplicar automaticamente as migrations"
+	@echo " make frontend-install  - instala as dependências do frontend"
+	@echo " make frontend-dev      - inicia o servidor de desenvolvimento (Vite)"
+	@echo " make frontend-lint     - executa a análise estática do código (Biome)"
+	@echo " make frontend-format   - formata automaticamente o código (Biome)"
+	@echo " make frontend-check    - verifica lint e formatação (Biome)"
+	@echo " make frontend-test     - executa os testes unitários e de integração (Vitest)"
+	@echo " make frontend-test-e2e - executa os testes de ponta a ponta (Playwright)"
+	@echo " make frontend-build    - gera a versão de produção do frontend"
 
 
 install:
@@ -120,3 +129,27 @@ db-revision:
 setup-db:
 	docker compose up -d --build
 	docker compose exec api poetry run alembic upgrade head
+
+frontend-install:
+	npm --prefix frontend ci
+
+frontend-dev:
+	npm --prefix frontend run dev
+
+frontend-lint:
+	npm --prefix frontend run lint
+
+frontend-format:
+	npm --prefix frontend run format
+
+frontend-check:
+	npm --prefix frontend run check
+
+frontend-test:
+	npm --prefix frontend run test
+
+frontend-test-e2e:
+	npm --prefix frontend run test:e2e
+
+frontend-build:
+	npm --prefix frontend run build
