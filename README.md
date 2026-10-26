@@ -358,6 +358,314 @@ Antes de iniciar a aplicação, deve-se copiar o arquivo `.env.example` para `.e
 
 A aplicação acessa a variável `DATABASE_URL` por meio do arquivo `backend/app/core/config.py`.
 
+
+# Prática 6 — Frontend com React
+
+## 1. Descrição
+
+Esta prática contém todo o desenvolvimento de uma interface web para gerenciamento de itens e usuários, utilizando **React, Vite e Tailwind CSS**.
+
+A aplicação apresenta um dashboard administrativo responsivo, com navegação entre as funcionalidades, indicadores de registros cadastrados, formulários, tabelas e mecanismos de busca.
+
+O frontend funciona de maneira independente do backend desenvolvido na Prática 5.
+
+> **Importante:** nesta etapa, não existe comunicação com a API FastAPI nem persistência em banco de dados. Os registros são armazenados temporariamente no estado do React, utilizando `useState`, e são perdidos quando a página é recarregada.
+
+## 2. Tecnologias utilizadas
+
+| Tecnologia | Finalidade |
+|---|---|
+| React | Desenvolvimento da interface e gerenciamento de estado |
+| Vite | Servidor de desenvolvimento e build |
+| Tailwind CSS | Estilização e responsividade |
+| JavaScript | Implementação da lógica da aplicação |
+| Biome | Linter e formatação |
+| Vitest | Testes unitários e de integração |
+| React Testing Library | Testes de componentes e interações |
+| Playwright | Testes de ponta a ponta (E2E) |
+| GitHub Actions | Integração contínua |
+
+## 3. Funcionalidades
+
+### 3.1. Dashboard
+
+A página inicial apresenta:
+
+- Indicadores com o total de itens e usuários cadastrados.
+- Navegação por abas entre itens e usuários.
+- Layout responsivo.
+- Mensagens de confirmação de todas as operações.
+- Interface organizada em cartões e tabelas.
+
+### 3.2. Gerenciamento de itens
+
+Permite:
+
+- Cadastrar itens.
+- Informar nome e descrição opcional.
+- Validar o preenchimento obrigatório do nome.
+- Limitar o nome a 100 caracteres.
+- Listar os itens cadastrados.
+- Buscar itens pelo nome.
+- Excluir itens mediante confirmação.
+
+### 3.3. Gerenciamento de usuários
+
+Permite:
+
+- Cadastrar usuários.
+- Listar os usuários cadastrados.
+- Buscar usuários pelo nome.
+- Editar nome e idade.
+- Excluir usuários com uma confirmação.
+- Cancelar a edição de um usuário.
+
+Os usuários possuem os seguintes campos:
+
+| Campo | Tipo | Validação |
+|---|---|---|
+| `id` | Inteiro | Gerado automaticamente no frontend |
+| `name` | String | Obrigatório, máximo de 100 caracteres |
+| `age` | Inteiro | Obrigatório, não negativo |
+
+## 4. Estrutura do frontend
+
+```text
+frontend/
+├── src/
+│   ├── components/
+│   │   ├── ItemForm.jsx
+│   │   ├── ItemList.jsx
+│   │   ├── UserForm.jsx
+│   │   └── UserList.jsx
+│   ├── App.jsx
+│   ├── main.jsx
+│   ├── index.css
+│   ├── validation.js
+│   └── userValidation.js
+├── tests/
+│   ├── unit/
+│   │   ├── validation.test.js
+│   │   ├── userValidation.test.js
+│   │   └── ItemForm.test.jsx
+│   ├── integration/
+│   │   ├── App.test.jsx
+│   │   └── Users.test.jsx
+│   └── e2e/
+│       ├── items.spec.js
+│       └── users.spec.js
+├── index.html
+├── vite.config.js
+├── playwright.config.js
+├── biome.json
+├── package.json
+└── package-lock.json
+```
+
+## 5. Instalação
+
+### 5.1. Pré-requisitos
+
+- Node.js compatível com as dependências do projeto.
+- npm.
+- Git.
+- Make, caso sejam utilizados os comandos do Makefile.
+
+### 5.2. Instalar dependências
+
+Na raiz do repositório:
+
+```bash
+make frontend-install
+```
+
+De forma alternativa:
+
+```bash
+cd frontend
+npm ci
+```
+
+O comando `npm ci` utiliza as versões registradas no `package-lock.json`, proporcionando instalações de forma reprodutível.
+
+## 6. Executando a aplicação
+
+Na raiz do repositório:
+
+```bash
+make frontend-dev
+```
+
+Ou, dentro de `frontend/`:
+
+```bash
+npm run dev
+```
+
+A aplicação estará disponível no endereço indicado pelo Vite, normalmente:
+
+`http://localhost:5173/`
+
+Para gerar a versão de produção:
+
+```bash
+npm run build
+```
+
+Os arquivos de produção serão gerados dentro de `frontend/dist/`.
+
+## 7. Testes automatizados
+
+O projeto utiliza três níveis de testes.
+
+### 7.1. Testes unitários
+
+Validam as regras de negócio dos formulários, incluindo:
+
+- Nome obrigatório.
+- Limite de 100 caracteres.
+- Remoção de espaços desnecessários.
+- Idade obrigatória.
+- Rejeição de idades negativas e decimais.
+
+Execução:
+
+```bash
+npm run test
+```
+
+### 7.2. Testes de integração
+
+Utilizam React Testing Library a fim de verificar o comportamento dos componentes e suas interações.
+
+Os cenários incluem:
+
+- Validação de formulário.
+- Cadastro e exibição de itens.
+- Cadastro de usuários.
+- Edição de usuários.
+- Exclusão de usuários.
+
+Os testes de integração são executados de forma conjunta com os unitários:
+
+```bash
+npm run test
+```
+
+### 7.3. Testes E2E
+
+Os testes de ponta a ponta utilizam Playwright com Chromium para simular as operações reais no navegador.
+
+Os cenários incluem:
+
+- Cadastro de item e exibição na tabela.
+- Cadastro, edição e exclusão de usuário.
+
+Para instalar o navegador utilize:
+
+```bash
+npx playwright install chromium
+```
+
+Para executar os testes:
+
+```bash
+npm run test:e2e
+```
+
+Para visualizar a execução no navegador utilize:
+
+```bash
+npx playwright test --headed
+```
+
+O Playwright utiliza a configuração `webServer` para iniciar automaticamente o servidor Vite durante os testes.
+
+## 8. Qualidade de código
+
+O projeto utiliza Biome para análise estática e padronização da formatação.
+
+Executar o linter:
+
+```bash
+npm run lint
+```
+
+Verificar a formatação:
+
+```bash
+npm run format:check
+```
+
+Aplicar a formatação:
+
+```bash
+npm run format
+```
+
+Executar as verificações gerais:
+
+```bash
+npm run check
+```
+
+As verificações são executadas automaticamente no workflow de integração contínua.
+
+## 9. Comandos do Makefile
+
+Os comandos do frontend podem ser executados a partir da raiz do repositório.
+
+| Comando | Descrição |
+|---|---|
+| `make frontend-install` | Instala as dependências |
+| `make frontend-dev` | Inicia o servidor Vite |
+| `make frontend-lint` | Executa o linter |
+| `make frontend-format` | Formata o código |
+| `make frontend-check` | Executa as verificações do Biome |
+| `make frontend-test` | Executa os testes unitários e de integração |
+| `make frontend-test-e2e` | Executa os testes E2E |
+| `make frontend-build` | Gera o build de produção |
+| `make check-all` | Executa as verificações configuradas do projeto |
+
+## 10. Integração contínua
+
+A integração contínua do frontend é configurada no arquivo:
+
+`.github/workflows/ci-frontend.yml`
+
+O workflow utiliza GitHub Actions e executa:
+
+1. Checkout do repositório.
+2. Configuração do Node.js.
+3. Instalação das dependências com `npm ci`.
+4. Análise estática com Biome.
+5. Verificação de formatação.
+6. Testes unitários e de integração com Vitest.
+7. Build de produção com Vite.
+8. Instalação do Chromium e suas dependências.
+9. Execução dos testes E2E com Playwright.
+10. Publicação do relatório do Playwright como artefato em caso de falha.
+
+A execução ocorre conforme os eventos e filtros de arquivos definidos no workflow, incluindo Pull Requests que modificam o frontend.
+
+## 11. Arquitetura e limitações
+
+A aplicação utiliza componentes React e gerenciamento de estado local.
+
+Os componentes de formulário são responsáveis pela entrada e validação dos dados, enquanto os componentes de listagem apresentam os registros e disponibilizam as ações de gerenciamento.
+
+O componente `App.jsx` concentra o estado da aplicação e coordena as operações de cadastro, edição e exclusão.
+
+**Limitações atuais:**
+
+- Não há comunicação HTTP com o backend.
+- Não há autenticação.
+- Não há persistência em banco de dados.
+- Os registros são perdidos ao atualizar a página.
+- A edição está disponível para usuários; itens podem ser cadastrados, consultados e excluídos.
+
+A integração com a API será desenvolvida em uma etapa posterior.
+
 ## Estrutura do projeto até o momento
 
 ```text
