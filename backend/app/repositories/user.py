@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.models.user import User
 
 
-# Retornar a lista de usuários
+# Retornar a lista de usuários criados
 def list_users(db: Session):
     statement = select(User)
     return db.scalars(statement).all()
@@ -15,7 +15,7 @@ def get_user(db: Session, user_id: int):
     return db.get(User, user_id)
 
 
-# Criar um usuário
+# Criar um usuário novo
 def create_user(db: Session, name: str, age: int):
     new_user = User(name=name, age=age)
 

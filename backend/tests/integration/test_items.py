@@ -8,6 +8,7 @@ def test_list_items(client):
         json={
             "name": "notebook",
             "quantity": 50,
+            "description": "Notebook para estudos",
         },
     )
 
@@ -20,6 +21,7 @@ def test_list_items(client):
     assert len(items) == 1
     assert items[0]["name"] == "notebook"
     assert items[0]["quantity"] == 50
+    assert items[0]["description"] == "Notebook para estudos"
     assert isinstance(items[0]["id"], int)
 
 
@@ -30,9 +32,11 @@ def test_get_item(client):
         json={
             "name": "notebook",
             "quantity": 50,
+            "description": "Notebook para estudos",
         },
     )
 
+    assert created.status_code == status.HTTP_201_CREATED
     item_id = created.json()["id"]
 
     response = client.get(f"/items/{item_id}")
@@ -42,6 +46,7 @@ def test_get_item(client):
         "id": item_id,
         "name": "notebook",
         "quantity": 50,
+        "description": "Notebook para estudos",
     }
 
 
@@ -55,7 +60,7 @@ def test_item_not_found(client):
     }
 
 
-# Teste de criação de um item
+# Teste de criação de um item sem descrição
 def test_create_item(client):
     response = client.post(
         "/items/",
@@ -72,6 +77,28 @@ def test_create_item(client):
     assert isinstance(item["id"], int)
     assert item["name"] == "mouse"
     assert item["quantity"] == 20
+    assert item["description"] is None
+
+
+# Teste de criação de um item com descrição
+def test_create_item_with_description(client):
+    response = client.post(
+        "/items/",
+        json={
+            "name": "teclado",
+            "quantity": 10,
+            "description": "Teclado mecânico USB",
+        },
+    )
+
+    assert response.status_code == status.HTTP_201_CREATED
+
+    item = response.json()
+
+    assert isinstance(item["id"], int)
+    assert item["name"] == "teclado"
+    assert item["quantity"] == 10
+    assert item["description"] == "Teclado mecânico USB"
 
 
 # Teste de atualização completa de um item
@@ -81,9 +108,11 @@ def test_update_item(client):
         json={
             "name": "notebook",
             "quantity": 50,
+            "description": "Notebook antigo",
         },
     )
 
+    assert created.status_code == status.HTTP_201_CREATED
     item_id = created.json()["id"]
 
     response = client.put(
@@ -91,6 +120,7 @@ def test_update_item(client):
         json={
             "name": "notebook-gamer",
             "quantity": 30,
+            "description": "Notebook para jogos",
         },
     )
 
@@ -99,6 +129,7 @@ def test_update_item(client):
         "id": item_id,
         "name": "notebook-gamer",
         "quantity": 30,
+        "description": "Notebook para jogos",
     }
 
 
@@ -109,9 +140,11 @@ def test_partial_update_item(client):
         json={
             "name": "notebook",
             "quantity": 50,
+            "description": "Notebook para estudos",
         },
     )
 
+    assert created.status_code == status.HTTP_201_CREATED
     item_id = created.json()["id"]
 
     response = client.patch(
@@ -126,6 +159,62 @@ def test_partial_update_item(client):
         "id": item_id,
         "name": "notebook",
         "quantity": 25,
+        "description": "Notebook para estudos",
+    }
+
+
+# Teste de atualização parcial da descrição
+def test_partial_update_item_description(client):
+    created = client.post(
+        "/items/",
+        json={
+            "name": "monitor",
+            "quantity": 5,
+            "description": "Monitor antigo",
+        },
+    )
+
+    assert created.status_code == status.HTTP_201_CREATED
+    item_id = created.json()["id"]
+
+    response = client.patch(
+        f"/items/{item_id}",
+        json={
+            "description": "Monitor LED 24 polegadas",
+        },
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == {
+        "id": item_id,
+        "name": "monitor",
+        "quantity": 5,
+        "description": "Monitor LED 24 polegadas",
+    }
+
+
+# Teste de persistência após nova consulta
+def test_item_persistence(client):
+    created = client.post(
+        "/items/",
+        json={
+            "name": "fone de ouvido",
+            "quantity": 3,
+            "description": "Fone Bluetooth",
+        },
+    )
+
+    assert created.status_code == status.HTTP_201_CREATED
+    item_id = created.json()["id"]
+
+    response = client.get(f"/items/{item_id}")
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == {
+        "id": item_id,
+        "name": "fone de ouvido",
+        "quantity": 3,
+        "description": "Fone Bluetooth",
     }
 
 
@@ -136,9 +225,11 @@ def test_delete_item(client):
         json={
             "name": "notebook",
             "quantity": 50,
+            "description": "Notebook para estudos",
         },
     )
 
+    assert created.status_code == status.HTTP_201_CREATED
     item_id = created.json()["id"]
 
     response = client.delete(f"/items/{item_id}")
