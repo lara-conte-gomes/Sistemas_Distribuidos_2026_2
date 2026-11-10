@@ -5,6 +5,8 @@ on:
   pull_request:
     paths:
       - "frontend/**"
+      - "backend/**"
+      - "compose.yaml"
       - ".github/workflows/ci-frontend.yml"
 
   push:
@@ -12,12 +14,22 @@ on:
       - main
     paths:
       - "frontend/**"
+      - "backend/**"
+      - "compose.yaml"
       - ".github/workflows/ci-frontend.yml"
 
 jobs:
   frontend:
     name: Biome, Vitest, Build e Playwright
     runs-on: ubuntu-latest
+
+    env:
+      POSTGRES_DB: app_test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/app_test
+      CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
+      VITE_API_URL: http://127.0.0.1:8000
 
     defaults:
       run:
@@ -34,7 +46,7 @@ jobs:
           cache: "npm"
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install dependencies
+      - name: Install frontend dependencies
         run: npm ci
 
       - name: Run Biome lint
@@ -49,17 +61,63 @@ jobs:
       - name: Build frontend
         run: npm run build
 
+      # Inicializa o banco de dados e a API
+      - name: Start PostgreSQL and FastAPI
+        working-directory: .
+        run: |
+          docker compose up -d --build db api
+
+      # Aguarda o FastAPI ficar disponível
+      - name: Wait for FastAPI
+        working-directory: .
+        run: |
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:8000/openapi.json > /dev/null; then
+              echo "FastAPI disponível"
+              exit 0
+            fi
+
+            sleep 2
+          done
+
+          echo "Erro: FastAPI não iniciou corretamente."
+          docker compose logs api db
+          exit 1
+
+      # Aplica as migrações no PostgreSQL
+      - name: Run Alembic migrations
+        working-directory: .
+        run: |
+          docker compose exec -T api alembic upgrade head
+
+      # Instala o navegador para os testes E2E
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
+      # Executa os testes com frontend, backend e banco ativos
       - name: Run Playwright E2E tests
         run: npm run test:e2e
 
+      # Salva relatórios em caso de falha
       - name: Upload Playwright Report
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
-          path: frontend/playwright-report/
+          path: |
+            frontend/playwright-report/
+            frontend/test-results/
           retention-days: 7
           if-no-files-found: ignore
+
+      # Exibe logs dos containers em caso de falha
+      - name: Show Docker logs on failure
+        if: failure()
+        working-directory: .
+        run: docker compose logs --no-color api db
+
+      # Encerra os containers e remove os volumes de teste
+      - name: Stop Docker containers
+        if: always()
+        working-directory: .
+        run: docker compose down -v

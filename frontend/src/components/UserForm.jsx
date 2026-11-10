@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import { validateUser } from "../userValidation";
 
-export default function UserForm({ onSaveUser, editingUser, onCancelEdit }) {
+export default function UserForm({
+  onSaveUser,
+  editingUser,
+  onCancelEdit,
+  saving = false,
+}) {
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [errors, setErrors] = useState({});
@@ -12,8 +17,10 @@ export default function UserForm({ onSaveUser, editingUser, onCancelEdit }) {
     setErrors({});
   }, [editingUser]);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
+
+    if (saving) return;
 
     const result = validateUser({ name, age });
 
@@ -22,10 +29,22 @@ export default function UserForm({ onSaveUser, editingUser, onCancelEdit }) {
       return;
     }
 
-    onSaveUser(result.values);
-    setName("");
-    setAge("");
-    setErrors({});
+    try {
+      // Aguarda a operação de cadastro ou edição
+      const success = await onSaveUser({
+        name: result.values.name,
+        age: Number(result.values.age),
+      });
+
+      // Limpa o formulário apenas após sucesso
+      if (success) {
+        setName("");
+        setAge("");
+        setErrors({});
+      }
+    } catch {
+      // O componente App.jsx exibirá o erro da API
+    }
   }
 
   return (
@@ -34,6 +53,7 @@ export default function UserForm({ onSaveUser, editingUser, onCancelEdit }) {
         <label htmlFor="user-name" className="mb-2 block text-sm font-medium">
           Nome do usuário
         </label>
+
         <input
           id="user-name"
           type="text"
@@ -42,8 +62,10 @@ export default function UserForm({ onSaveUser, editingUser, onCancelEdit }) {
           placeholder="Ex.: Maria Silva"
           aria-invalid={Boolean(errors.name)}
           aria-describedby={errors.name ? "user-name-error" : undefined}
+          disabled={saving}
           className="w-full rounded-lg border border-slate-300 px-3 py-2.5 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
         />
+
         {errors.name && (
           <p
             id="user-name-error"
@@ -59,6 +81,7 @@ export default function UserForm({ onSaveUser, editingUser, onCancelEdit }) {
         <label htmlFor="user-age" className="mb-2 block text-sm font-medium">
           Idade
         </label>
+
         <input
           id="user-age"
           type="number"
@@ -69,8 +92,10 @@ export default function UserForm({ onSaveUser, editingUser, onCancelEdit }) {
           placeholder="Ex.: 25"
           aria-invalid={Boolean(errors.age)}
           aria-describedby={errors.age ? "user-age-error" : undefined}
+          disabled={saving}
           className="w-full rounded-lg border border-slate-300 px-3 py-2.5 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
         />
+
         {errors.age && (
           <p
             id="user-age-error"
@@ -85,16 +110,22 @@ export default function UserForm({ onSaveUser, editingUser, onCancelEdit }) {
       <div className="flex flex-wrap gap-3">
         <button
           type="submit"
-          className="flex-1 rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white transition hover:bg-indigo-700"
+          disabled={saving}
+          className="flex-1 rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {editingUser ? "Salvar alterações" : "Cadastrar usuário"}
+          {saving
+            ? "Salvando..."
+            : editingUser
+              ? "Salvar alterações"
+              : "Cadastrar usuário"}
         </button>
 
         {editingUser && (
           <button
             type="button"
             onClick={onCancelEdit}
-            className="rounded-lg border border-slate-300 px-4 py-3 font-medium hover:bg-slate-50"
+            disabled={saving}
+            className="rounded-lg border border-slate-300 px-4 py-3 font-medium hover:bg-slate-50 disabled:opacity-50"
           >
             Cancelar
           </button>

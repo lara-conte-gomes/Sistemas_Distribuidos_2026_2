@@ -1,4 +1,9 @@
-export default function UserList({ users, onEditUser, onDeleteUser }) {
+export default function UserList({
+  users,
+  onEditUser,
+  onDeleteUser,
+  saving = false,
+}) {
   if (users.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-12 text-center">
@@ -37,8 +42,9 @@ export default function UserList({ users, onEditUser, onDeleteUser }) {
                   <button
                     type="button"
                     onClick={() => onEditUser(user)}
+                    disabled={saving}
                     aria-label={`Editar ${user.name}`}
-                    className="rounded-lg px-3 py-2 font-medium text-indigo-600 hover:bg-indigo-50"
+                    className="rounded-lg px-3 py-2 font-medium text-indigo-600 hover:bg-indigo-50 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     Editar
                   </button>
@@ -46,8 +52,9 @@ export default function UserList({ users, onEditUser, onDeleteUser }) {
                   <button
                     type="button"
                     onClick={() => onDeleteUser(user.id)}
+                    disabled={saving}
                     aria-label={`Excluir ${user.name}`}
-                    className="rounded-lg px-3 py-2 font-medium text-red-600 hover:bg-red-50"
+                    className="rounded-lg px-3 py-2 font-medium text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     Excluir
                   </button>

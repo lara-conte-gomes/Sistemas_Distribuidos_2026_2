@@ -666,6 +666,44 @@ O componente `App.jsx` concentra o estado da aplicação e coordena as operaçõ
 
 A integração com a API será desenvolvida em uma etapa posterior.
 
+
+## Prática 7 — Integração entre o Frontend e o Backend
+
+Nesta prática, foi realizada a integração do frontend em **React** com a API **FastAPI**, utilizando **PostgreSQL** para persistência dos dados utilizados nas atividades.
+
+### Funcionalidades implementadas nessa prática
+
+- Implementação do CRUD de usuários (cadastro, listagem, edição e exclusão).
+- Adição do campo de descrição aos itens, com migração do banco de dados utilizando Alembic.
+- Validação dos formulários e tratamento de erros nas requisições HTTP.
+- Atualização das listagens após a aplicação das operações de cadastro, edição e exclusão.
+- Implementação de testes unitários e de integração com **Vitest** e testes E2E com **Playwright**.
+
+### Execução e testes
+
+Para aplicar as migrações do banco de dados:
+
+```bash
+make db-upgrade
+```
+
+Para iniciar o frontend:
+
+```bash
+make frontend-dev
+```
+
+Para executar as verificações e os testes automatizados:
+
+```bash
+make check-all
+make e2e
+```
+
+Todas as verificações locais e os testes automatizados foram executados com sucesso.
+
+**Observação:** o CRUD completo foi implementado para usuários e itens.
+
 ## Estrutura do projeto até o momento
 
 ```text

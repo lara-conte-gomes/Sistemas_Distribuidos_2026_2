@@ -4,22 +4,28 @@ from sqlalchemy.orm import Session
 from app.models.item import Item
 
 
-# Ver a lista de itens
+# Listar todos os itens que existem
 def list_items(db: Session):
     statement = select(Item)
     return db.scalars(statement).all()
 
 
-# Buscar um item
+# Buscar um item pelo ID
 def get_item(db: Session, item_id: int):
     return db.get(Item, item_id)
 
 
-# Criar um item
-def create_item(db: Session, name: str, quantity: int):
+# Criar um item novo
+def create_item(
+    db: Session,
+    name: str,
+    quantity: int,
+    description: str | None = None,
+):
     new_item = Item(
         name=name,
         quantity=quantity,
+        description=description,
     )
 
     db.add(new_item)
@@ -29,7 +35,7 @@ def create_item(db: Session, name: str, quantity: int):
     return new_item
 
 
-# Atualizar alguma informação do item
+# Atualizar um item da plataforma
 def update_item(db: Session, item_id: int, data: dict):
     item = get_item(db, item_id)
 
@@ -45,7 +51,7 @@ def update_item(db: Session, item_id: int, data: dict):
     return item
 
 
-# Deletar alguma informação do item
+# Excluir um item da plataforma
 def delete_item(db: Session, item_id: int):
     item = get_item(db, item_id)
 

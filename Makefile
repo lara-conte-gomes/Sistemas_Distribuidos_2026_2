@@ -1,5 +1,6 @@
 .PHONY: install run test test-verbose lint format-check lint-fix ci clean up build rebuild down logs logs-api ps shell
 .PHONY: frontend-install frontend-dev frontend-lint frontend-format frontend-check frontend-test frontend-test-e2e frontend-build
+.PHONY: check-all up-build e2e
 
 BACKEND := backend
 POETRY := poetry run
@@ -10,7 +11,7 @@ DOCKER := docker compose
 
 help:
 	@echo "Lista de Comandos:"
-	@echo " make install  - instala as dependências"
+	@echo " make install  - instala as dependencias"
 	@echo " make run      - inicia o servidor"
 	@echo " make test     - entra na pasta backend e executa testes com pytest"
 	@echo " make test-verbose     - entra na pasta backend e executa testes com pytest mostrando mais detalhes"
@@ -18,11 +19,11 @@ help:
 	@echo " make format	  - verifica a formatacao do codigo e corrige ela"
 	@echo " make format-check     - verifica a formatacao do codigo"
 	@echo " make lint-fix     - corrige problemas de lint"
-	@echo " make ci     - executa a Integração Contínua de format-check, lint e test"
+	@echo " make ci     - executa a Integracao Continua de format-check, lint e test"
 	@echo " make clean    - realiza limpeza de cache"
 	@echo "	make up 	   - inicia o container do Docker Compose"
 	@echo "	make build    - constroi ou reconstroi a imagem do Docker"
-	@echo "	make rebuild    - reconstrói as imagens e inicia os containers em segundo plano"
+	@echo "	make rebuild    - reconstroi as imagens e inicia os containers em segundo plano"
 	@echo "	make down 	   - para e remove o container do Docker Compose"
 	@echo "	make logs 	   - exibe os logs do container"
 	@echo "	make logs-api - exibe os logs da API"
@@ -36,14 +37,17 @@ help:
 	@echo " make db-shell      - abre o terminal do PostgreSQL"
 	@echo " make db-revision MSG='descricao' - gera uma nova migration"
 	@echo " make db-setup      - inicia o Docker Compose e aplicar automaticamente as migrations"
-	@echo " make frontend-install  - instala as dependências do frontend"
+	@echo " make frontend-install  - instala as dependencias do frontend"
 	@echo " make frontend-dev      - inicia o servidor de desenvolvimento (Vite)"
-	@echo " make frontend-lint     - executa a análise estática do código (Biome)"
-	@echo " make frontend-format   - formata automaticamente o código (Biome)"
-	@echo " make frontend-check    - verifica lint e formatação (Biome)"
-	@echo " make frontend-test     - executa os testes unitários e de integração (Vitest)"
+	@echo " make frontend-lint     - executa a analise estatica do codigo (Biome)"
+	@echo " make frontend-format   - formata automaticamente o codigo (Biome)"
+	@echo " make frontend-check    - verifica lint e formatacao (Biome)"
+	@echo " make frontend-test     - executa os testes unitarios e de integracao (Vitest)"
 	@echo " make frontend-test-e2e - executa os testes de ponta a ponta (Playwright)"
-	@echo " make frontend-build    - gera a versão de produção do frontend"
+	@echo " make frontend-build    - gera a versao de producao do frontend"
+	@echo " make check-all         - verifica formatacao, lint e testes do backend; verifica e testa o frontend e gera o build"
+	@echo " make up-build          - reconstroi e inicia os containers"
+	@echo " make e2e               - executa os testes Playwright"
 
 
 install:
@@ -153,3 +157,9 @@ frontend-test-e2e:
 
 frontend-build:
 	npm --prefix frontend run build
+
+check-all: ci frontend-check frontend-test frontend-build
+
+up-build: rebuild
+
+e2e: frontend-test-e2e
