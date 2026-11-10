@@ -1,4 +1,6 @@
-const API_URL = "http://localhost:8000/users/";
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
+
+const API_URL = `${API_BASE_URL.replace(/\/$/, "")}/users/`;
 
 async function handleResponse(response) {
   if (!response.ok) {
