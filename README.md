@@ -702,7 +702,7 @@ make e2e
 
 Todas as verificações locais e os testes automatizados foram executados com sucesso.
 
-**Observação:** o CRUD completo foi implementado para usuários. Para itens, o cadastro e a listagem possuem persistência no banco de dados, enquanto a exclusão permanece local.
+**Observação:** o CRUD completo foi implementado para usuários e itens.
 
 ## Estrutura do projeto até o momento
 

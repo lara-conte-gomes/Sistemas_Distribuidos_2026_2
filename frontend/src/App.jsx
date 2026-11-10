@@ -5,7 +5,13 @@ import ItemList from "./components/ItemList";
 import UserForm from "./components/UserForm";
 import UserList from "./components/UserList";
 
-import { createItem, listItems } from "./services/items";
+import {
+  createItem,
+  deleteItem as deleteItemApi,
+  listItems,
+  updateItem,
+} from "./services/items";
+
 import {
   createUser,
   deleteUser as deleteUserApi,
@@ -19,6 +25,7 @@ export default function App() {
   const [items, setItems] = useState([]);
   const [users, setUsers] = useState([]);
 
+  const [editingItem, setEditingItem] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
 
   const [search, setSearch] = useState("");
@@ -103,8 +110,8 @@ export default function App() {
     setMessage("");
   }
 
-  // Cadastra um item no backend
-  async function addItem(item) {
+  // Cadastra ou atualiza um item no backend
+  async function saveItem(values) {
     if (savingItem) return false;
 
     setSavingItem(true);
@@ -112,19 +119,33 @@ export default function App() {
     setMessage("");
 
     try {
-      await createItem(item);
+      const itemData = {
+        name: values.name,
+        description: values.description,
+        quantity: Number(values.quantity),
+      };
 
-      const updatedItems = await listItems();
-      setItems(updatedItems);
+      if (editingItem) {
+        await updateItem(editingItem.id, itemData);
 
-      showMessage("Item cadastrado com sucesso.");
+        const updatedItems = await listItems();
+        setItems(updatedItems);
+
+        setEditingItem(null);
+        showMessage("Item atualizado com sucesso.");
+      } else {
+        await createItem(itemData);
+
+        const updatedItems = await listItems();
+        setItems(updatedItems);
+
+        showMessage("Item cadastrado com sucesso.");
+      }
 
       return true;
     } catch (err) {
       setError(
-        err instanceof Error
-          ? err.message
-          : "Não foi possível cadastrar o item.",
+        err instanceof Error ? err.message : "Não foi possível salvar o item.",
       );
 
       return false;
@@ -133,17 +154,36 @@ export default function App() {
     }
   }
 
-  // Exclusão de itens ainda é local
-  function deleteItem(id) {
+  // Exclui um item do backend
+  async function deleteItem(id) {
+    if (savingItem) return;
+
     if (!window.confirm("Deseja realmente excluir este item?")) {
       return;
     }
 
-    setItems((previous) => previous.filter((item) => item.id !== id));
+    setSavingItem(true);
+    setError("");
+    setMessage("");
 
-    showMessage(
-      "Item removido da lista local. A exclusão ainda não foi salva no banco.",
-    );
+    try {
+      await deleteItemApi(id);
+
+      const updatedItems = await listItems();
+      setItems(updatedItems);
+
+      if (editingItem?.id === id) {
+        setEditingItem(null);
+      }
+
+      showMessage("Item excluído com sucesso.");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Não foi possível excluir o item.",
+      );
+    } finally {
+      setSavingItem(false);
+    }
   }
 
   // Cadastra ou atualiza um usuário no backend
@@ -343,13 +383,22 @@ export default function App() {
 
             <div className="grid gap-6 lg:grid-cols-[1fr_1.3fr]">
               <div className="self-start rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <h2 className="mb-2 text-xl font-bold">Cadastro de itens</h2>
+                <h2 className="mb-2 text-xl font-bold">
+                  {editingItem ? "Editar item" : "Cadastro de itens"}
+                </h2>
 
                 <p className="mb-6 text-sm text-slate-500">
-                  Preencha os campos para adicionar um item.
+                  {editingItem
+                    ? "Altere os campos para atualizar o item."
+                    : "Preencha os campos para adicionar um item."}
                 </p>
 
-                <ItemForm onAddItem={addItem} saving={savingItem} />
+                <ItemForm
+                  onSaveItem={saveItem}
+                  editingItem={editingItem}
+                  onCancelEdit={() => setEditingItem(null)}
+                  saving={savingItem}
+                />
               </div>
 
               <div className="min-w-0 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -379,7 +428,12 @@ export default function App() {
                     Carregando itens...
                   </p>
                 ) : (
-                  <ItemList items={filteredItems} onDeleteItem={deleteItem} />
+                  <ItemList
+                    items={filteredItems}
+                    onEditItem={setEditingItem}
+                    onDeleteItem={deleteItem}
+                    saving={savingItem}
+                  />
                 )}
               </div>
             </div>
