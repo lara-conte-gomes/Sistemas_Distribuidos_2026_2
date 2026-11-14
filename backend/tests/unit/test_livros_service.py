@@ -1,17 +1,21 @@
 from app.api.schemas.livros_schemas import CriarLivro, LivroPatch, LivroUpdate
 from app.api.services import livros_service
 
-#Funcao de preparacao de testes
+
+# Funcao de preparacao de testes
 def setup_function():
     livros_service.livros.clear()
-    livros_service.livros.append({
-        "titulo": "A Bússola de Ouro",
-        "genero": "aventura",
-        "publico_alvo": "jovens",
-        "quantidade": 10,
-    })
+    livros_service.livros.append(
+        {
+            "titulo": "A Bússola de Ouro",
+            "genero": "aventura",
+            "publico_alvo": "jovens",
+            "quantidade": 10,
+        }
+    )
 
-#Teste de listagem dos livros
+
+# Teste de listagem dos livros
 def test_list_livros():
     livros = livros_service.lista_livros()
 
@@ -23,7 +27,8 @@ def test_list_livros():
         "quantidade": 10,
     }
 
-#Teste de busca de um livro
+
+# Teste de busca de um livro
 def test_get_livro():
     livros = livros_service.get_livro("A Bússola de Ouro")
 
@@ -35,11 +40,12 @@ def test_get_livro():
         "quantidade": 10,
     }
 
-#Teste de criacao de um livro
+
+# Teste de criacao de um livro
 def test_adicionar_livro():
     livros = CriarLivro(
         titulo="Desventuras em Série",
-        genero="aventura", 
+        genero="aventura",
         publico_alvo="todas as idades",
         quantidade=30,
     )
@@ -55,11 +61,12 @@ def test_adicionar_livro():
 
     assert len(livros_service.livros) == 2
 
-#Teste de atualizacao completa de um livro
+
+# Teste de atualizacao completa de um livro
 def test_update_livro():
     livros = LivroUpdate(
         titulo="Coração de Tinta",
-        genero="ação", 
+        genero="ação",
         publico_alvo="todas as idades",
         quantidade=50,
     )
@@ -76,7 +83,8 @@ def test_update_livro():
         "quantidade": 50,
     }
 
-#Teste de atualizacao parcial de um livro
+
+# Teste de atualizacao parcial de um livro
 def test_partial_update_livro():
     livros = LivroPatch(
         genero="aventura e fantasia",
@@ -94,10 +102,10 @@ def test_partial_update_livro():
         "quantidade": 10,
     }
 
-#Teste de remocao de um um livro
+
+# Teste de remocao de um um livro
 def test_delete_livros():
     deleted = livros_service.delete_livro("A Bússola de Ouro")
 
     assert deleted is True
     assert len(livros_service.livros) == 0
-

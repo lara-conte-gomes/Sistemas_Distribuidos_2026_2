@@ -16,7 +16,7 @@ class RevistaUpdate(BaseModel):
     genero: str
     edicao: str
     quantidade: int
-    
+
 
 # Atualização parcial das informações da revista
 class RevistaPatch(BaseModel):
@@ -24,4 +24,3 @@ class RevistaPatch(BaseModel):
     genero: str | None = None
     edicao: str | None = None
     quantidade: int | None = None
-    

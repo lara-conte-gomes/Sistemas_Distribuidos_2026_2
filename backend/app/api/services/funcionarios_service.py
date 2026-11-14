@@ -1,8 +1,8 @@
 # Primeiro funcionario
 funcionarios = [
     {
-        "nome": "João", 
-        "idade": 25, 
+        "nome": "João",
+        "idade": 25,
         "cargo": "caixa",
     }
 ]
