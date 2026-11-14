@@ -4,7 +4,7 @@
 #Criação de variáveis
 BACKEND := backend
 POETRY := poetry run
-PYTEST := $(POETRY) pytest
+PYTEST := $(POETRY) python -m pytest
 UVICORN := $(POETRY) uvicorn
 RUFF := $(POETRY) ruff
 DOCKER := docker compose
@@ -14,9 +14,15 @@ help:
 	@echo "Lista de comandos do MakeFile"
 	@echo "make install - instalacao das dependencias"
 	@echo "make run - inicializacao do servidor"
-	@echo "make test - execucao dos testes com pytest"
+	@echo "make teste - execucao dos testes com pytest"
+	@echo "make teste-verbose - execucao dos testes com logs"
 	@echo "make lint - verificacao de erros e boas praticas de codigo"
-	@echo "make cache - realiza a limpea do cache"
+	@echo "make lint-fix - correcao de problemas com lint"
+	@echo "make formatacao-check - vericacao da formatacao do codigo"
+	@echo "make formatacao - verifica e corrige a formatacao do codigo"
+	@echo "make cache - realiza a limpeza do cache"
+	@echo "make ci-backend - execucao da integracao continua"
+
 	@echo "make up - inicializacao do container docker"
 	@echo "make build - contrucao ou reconstrucao da imagem do docker"
 	@echo "make rebuild - reconstrucao das imagens e inicializacao em segundo plano do docker"
@@ -32,11 +38,25 @@ install:
 run:
 	@cd $(BACKEND) && $(UVICORN) app.main:app --reload
 
-test:
+teste:
 	@cd $(BACKEND) && $(PYTEST)
+
+teste-verbose:
+	@cd $(BACKEND) && $(PYTEST) -v
 
 lint:
 	@cd $(BACKEND) && $(RUFF) check .
+
+formatacao-check:
+	@cd $(BACKEND) && $(RUFF) format --check .
+
+formatacao:
+	@cd $(BACKEND) && $(RUFF) format .
+
+lint-fix:
+	@cd $(BACKEND) && $(RUFF) check . --fix
+
+ci: formatacao-check lint test
 
 cache:
 	@cd $(BACKEND) && rm -rf .pytest_cache
