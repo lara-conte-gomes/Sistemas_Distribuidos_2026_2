@@ -4,17 +4,17 @@ on:
   push:
     paths:
       - "backend/**"
-      - ".github/workflows/ci_backend.yml"
+      - ".github/workflows/ci-backend.yml"
 
   pull_request:
     paths:
       - "backend/**"
-      - ".github/workflows/ci_backend.yml"
+      - ".github/workflows/ci-backend.yml"
 
 jobs:
   lint-and-format:
     name: Ruff (Lint & Format)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     defaults:
       run:
@@ -30,7 +30,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11.9"
+          python-version: "3.11"
           cache: "poetry"
           cache-dependency-path: backend/poetry.lock
 
@@ -45,7 +45,7 @@ jobs:
 
   tests:
     name: Pytest
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     defaults:
       run:
