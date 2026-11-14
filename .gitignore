@@ -1,0 +1,5 @@
+#cache do Python
+.pytest_cache/
+
+#Ambiente virtual .env
+.env

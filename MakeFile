@@ -1,0 +1,68 @@
+#Tarefas
+.PHONY: install run test lint clean
+
+#Criação de variáveis
+BACKEND := backend
+POETRY := poetry run
+PYTEST := $(POETRY) pytest
+UVICORN := $(POETRY) uvicorn
+RUFF := $(POETRY) ruff
+DOCKER := docker compose
+
+#Lista de comandos
+help:
+	@echo "Lista de comandos do MakeFile"
+	@echo "make install - instalacao das dependencias"
+	@echo "make run - inicializacao do servidor"
+	@echo "make test - execucao dos testes com pytest"
+	@echo "make lint - verificacao de erros e boas praticas de codigo"
+	@echo "make cache - realiza a limpea do cache"
+	@echo "make up - inicializacao do container docker"
+	@echo "make build - contrucao ou reconstrucao da imagem do docker"
+	@echo "make rebuild - reconstrucao das imagens e inicializacao em segundo plano do docker"
+	@echo "make logs - exibicao dos logs do container"
+	@echo "make api-logs - exibicao dos logs gerados da API"
+	@echo "make down - paralizacao e remocao do container"
+	@echo "make status_container - lista o status do container"
+	@echo "make shell_api - abertura de um terminal dentro do container da API"
+
+install:
+	@cd $(BACKEND) && poetry install
+
+run:
+	@cd $(BACKEND) && $(UVICORN) app.main:app --reload
+
+test:
+	@cd $(BACKEND) && $(PYTEST)
+
+lint:
+	@cd $(BACKEND) && $(RUFF) check .
+
+cache:
+	@cd $(BACKEND) && rm -rf .pytest_cache
+	@cd $(BACKEND) && rm -rf __pycache__
+
+up:
+	$(DOCKER) up -d
+
+build:
+	$(DOCKER) build
+
+rebuild:
+	$(DCOKER) up --build -d
+
+logs:
+	$(DOCKER) logs -f
+
+api-logs:
+	$(DOCKER) logs -f api
+
+down:
+	$(DCOKER) down
+
+status_container:
+	$(DOCKER) ps
+
+shell_api:
+	$(DOCKER) exec api sh
+

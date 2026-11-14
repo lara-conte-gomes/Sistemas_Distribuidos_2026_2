@@ -1,0 +1,21 @@
+#extensões git
+.git 
+.gitignore
+
+#extensões python
+__pycache__
+*.pyc
+.pytest_cache
+.venv
+
+#arquivo de configuração
+.env
+.env.*
+
+#testes
+tests
+coverage
+
+#arquivos gerais
+dist
+build
