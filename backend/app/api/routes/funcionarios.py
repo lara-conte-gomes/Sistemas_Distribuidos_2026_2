@@ -13,7 +13,7 @@ router = APIRouter(prefix="/funcionario", tags=["Funcionarios"])
 # Rota para mostrar a lista de funcionarios que trabalham na loja
 @router.get("/")
 def lista_funcionarios():
-    return funcionarios_service.lista_livros()
+    return funcionarios_service.lista_funcionarios()
 
 
 # Rota para buscar um funcionario específico
@@ -25,7 +25,7 @@ def get_funcionario(funcionario_nome: str):
     if funcionario is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            details="O funcionario que você busca não foi encontrado",
+            detail="O funcionario que você busca não foi encontrado",
         )
 
     return funcionario
@@ -48,7 +48,7 @@ def update_funcionario(funcionario_nome: str, funcionario: FuncionarioUpdate):
     if updated_funcionario is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            details="O funcionario que você busca não foi encontrado",
+            detail="O funcionario que você busca não foi encontrado",
         )
 
     return updated_funcionario
@@ -65,7 +65,7 @@ def partial_update_funcionario(funcionario_nome: str, funcionario: FuncionarioPa
     if parcial_updated_funcionario is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            details="O funcionario que você busca não foi encontrado",
+            detail="O funcionario que você busca não foi encontrado",
         )
 
     return parcial_updated_funcionario
@@ -80,7 +80,7 @@ def delete_funcionario(funcionario_nome: str):
     if not deletar:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            details="O funcionario que você busca não foi encontrado",
+            detail="O funcionario que você busca não foi encontrado",
         )
 
     return {"mensagem": "O funcionario foi removido com sucesso"}

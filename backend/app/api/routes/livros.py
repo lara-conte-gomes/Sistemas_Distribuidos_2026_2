@@ -21,7 +21,7 @@ def get_livro(livro_titulo: str):
     if livro is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            details="O livro que você busca não foi encontrado",
+            detail="O livro que você busca não foi encontrado",
         )
 
     return livro
@@ -42,7 +42,7 @@ def update_livro(livro_titulo: str, livro: LivroUpdate):
     if updated_livro is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            details="O livro que você busca não foi encontrado",
+            detail="O livro que você busca não foi encontrado",
         )
 
     return updated_livro
@@ -57,7 +57,7 @@ def partial_update_livro(livro_titulo: str, livro: LivroPatch):
     if parcial_updated_livro is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            details="O livro que você busca não foi encontrado",
+            detail="O livro que você busca não foi encontrado",
         )
 
     return parcial_updated_livro
@@ -72,7 +72,7 @@ def delete_livro(livro_titulo: str):
     if not deletar:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            details="O livro que você busca não foi encontrado",
+            detail="O livro que você busca não foi encontrado",
         )
 
     return {"mensagem": "O livro foi removido com sucesso"}

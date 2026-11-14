@@ -35,12 +35,12 @@ def adicionar_livro(livro):
 def update_livro(livro_titulo: str, livro):
     for i in livros:
         if i["titulo"] == livro_titulo:
-            i["nome"] = livro.nome
-            i["genero"] = livro.idade
+            i["titulo"] = livro.titulo
+            i["genero"] = livro.genero
             i["publico_alvo"] = livro.publico_alvo
             i["quantidade"] = livro.quantidade
 
-            return livros
+            return i
 
     return None
 

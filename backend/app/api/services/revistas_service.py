@@ -1,10 +1,10 @@
 # Primeira revista
 revistas = [
     {
-        "titulo": "Mundo Estranho",
-        "genero": "tecnologia",
-        "quantidade": 10,
+        "titulo": "Quatro Rodas",
+        "genero": "carro",
         "edicao": "Novembro",
+        "quantidade": 35,
     }
 ]
 
@@ -26,7 +26,7 @@ def get_revista(revista_titulo: str):
 # Funca para adicionar uma nova revista
 def adicionar_revista(revista):
     nova_revista = revista.model_dump()
-    revista.append(nova_revista)
+    revistas.append(nova_revista)
 
     return nova_revista
 
@@ -35,12 +35,12 @@ def adicionar_revista(revista):
 def update_revista(revista_titulo: str, revista):
     for i in revistas:
         if i["titulo"] == revista_titulo:
-            i["nome"] = revista.nome
-            i["genero"] = revista.idade
+            i["titulo"] = revista.titulo
+            i["genero"] = revista.genero
             i["quantidade"] = revista.quantidade
             i["edicao"] = revista.edicao
 
-            return revistas
+            return i
 
     return None
 

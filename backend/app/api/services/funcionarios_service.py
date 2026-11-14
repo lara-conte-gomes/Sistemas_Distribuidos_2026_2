@@ -1,5 +1,11 @@
 # Primeiro funcionario
-funcionarios = [{"nome": "João", "idade": 25, "cargo": "caixa"}]
+funcionarios = [
+    {
+        "nome": "João", 
+        "idade": 25, 
+        "cargo": "caixa",
+    }
+]
 
 
 # Funcao para retornar a lista de funcionarios
@@ -32,7 +38,7 @@ def update_funcionario(funcionario_nome: str, funcionario):
             i["idade"] = funcionario.idade
             i["cargo"] = funcionario.cargo
 
-            return funcionarios
+            return i
 
     return None
 
