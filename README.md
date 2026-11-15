@@ -22,7 +22,7 @@ Durante todo o desenvolvimento (até o momento, dia 14/11/2026), utilizou-se alg
 Obs: por enquanto não implementou-se a comunicação da API com o banco de dados
 
 ## Estrutura do projeto
-
+```text
 Sistemas_Distribuidos_2026_2/
 │
 ├── .github/
@@ -76,4 +76,4 @@ Sistemas_Distribuidos_2026_2/
 ├── LICENSE
 ├── Makefile
 └── README.md
-
+```
