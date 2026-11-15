@@ -1,21 +1,25 @@
-from fastapi import APIRouter, HTTPException, status
+from typing import Annotated
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from app.database.session import get_db
 
-from app.api.schemas.livros_schemas import CriarLivro, LivroPatch, LivroUpdate
-from app.api.services import livros_service
+from app.schemas.livros_schemas import CriarLivro, LivroPatch, LivroUpdate
+from app.services import livros_service
 
 router = APIRouter(prefix="/livros", tags=["Livros"])
 
+DbSession = Annotated[Session, Depends(get_db)]
 
 # Rota para mostrar a lista de livros que exitem na loja
 @router.get("/")
-def lista_livros():
-    return livros_service.lista_livros()
+def lista_livros(db: DbSession):
+    return livros_service.lista_livros(db)
 
 
 # Rota para buscar um livro específico
 @router.get("/{livro_titulo}")
-def get_livro(livro_titulo: str):
-    livro = livros_service.get_livro(livro_titulo)
+def get_livro(livro_titulo: str, db: DbSession):
+    livro = livros_service.get_livro(db, livro_titulo)
 
     # Exceção para caso o livro não exista na lista
     if livro is None:
@@ -29,14 +33,14 @@ def get_livro(livro_titulo: str):
 
 # Rota para a adição de um livro novo
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def adicionar_livro(livro: CriarLivro):
-    return livros_service.adicionar_livro(livro)
+def adicionar_livro(livro: CriarLivro, db: DbSession):
+    return livros_service.adicionar_livro(db, livro)
 
 
 # Rota para atualizar um livro
 @router.put("/{livro_titulo}")
-def update_livro(livro_titulo: str, livro: LivroUpdate):
-    updated_livro = livros_service.update_livro(livro_titulo, livro)
+def update_livro(livro_titulo: str, livro: LivroUpdate, db: DbSession):
+    updated_livro = livros_service.update_livro(db, livro_titulo, livro)
 
     # Exceção para caso o livro não exista na lista
     if updated_livro is None:
@@ -50,8 +54,8 @@ def update_livro(livro_titulo: str, livro: LivroUpdate):
 
 # Rota para atualização parcial dos dados de um livro
 @router.patch("/{livro_titulo}")
-def partial_update_livro(livro_titulo: str, livro: LivroPatch):
-    parcial_updated_livro = livros_service.partial_update_livro(livro_titulo, livro)
+def partial_update_livro(livro_titulo: str, livro: LivroPatch, db: DbSession):
+    parcial_updated_livro = livros_service.partial_update_livro(db, livro_titulo, livro)
 
     # Exceção para caso o livro não exista na lista
     if parcial_updated_livro is None:
@@ -65,8 +69,8 @@ def partial_update_livro(livro_titulo: str, livro: LivroPatch):
 
 # Rota para deletar um livro
 @router.delete("/{livro_titulo}")
-def delete_livro(livro_titulo: str):
-    deletar = livros_service.delete_livro(livro_titulo)
+def delete_livro(livro_titulo: str, db: DbSession):
+    deletar = livros_service.delete_livro(db, livro_titulo)
 
     # Exceção para caso o livro não exista na lista
     if not deletar:

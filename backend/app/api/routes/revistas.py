@@ -1,21 +1,25 @@
-from fastapi import APIRouter, HTTPException, status
+from typing import Annotated
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from app.database.session import get_db
 
-from app.api.schemas.revistas_schemas import CriarRevista, RevistaPatch, RevistaUpdate
-from app.api.services import revistas_service
+from app.schemas.revistas_schemas import CriarRevista, RevistaPatch, RevistaUpdate
+from app.services import revistas_service
 
 router = APIRouter(prefix="/revista", tags=["Revista"])
 
+DbSession = Annotated[Session, Depends(get_db)]
 
 # Rota para mostrar a lista de revistas que tem na loja
 @router.get("/")
-def lista_revistas():
-    return revistas_service.lista_revistas()
+def lista_revistas(db: DbSession):
+    return revistas_service.lista_revistas(db)
 
 
 # Rota para buscar uma revista específica
 @router.get("/{revista_titulo}")
-def get_revista(revista_titulo: str):
-    revista = revistas_service.get_revista(revista_titulo)
+def get_revista(revista_titulo: str, db: DbSession):
+    revista = revistas_service.get_revista(db, revista_titulo)
 
     # Exceção para caso a revista não exista na lista
     if revista is None:
@@ -29,14 +33,14 @@ def get_revista(revista_titulo: str):
 
 # Rota para a adição de uma revista nova
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def adicionar_revista(revista: CriarRevista):
-    return revistas_service.adicionar_revista(revista)
+def adicionar_revista(revista: CriarRevista, db: DbSession):
+    return revistas_service.adicionar_revista(db, revista)
 
 
 # Rota para atualizar uma revista
 @router.put("/{revista_titulo}")
-def update_revista(revista_titulo: str, revista: RevistaUpdate):
-    updated_revista = revistas_service.update_revista(revista_titulo, revista)
+def update_revista(revista_titulo: str, revista: RevistaUpdate, db: DbSession):
+    updated_revista = revistas_service.update_revista(db, revista_titulo, revista)
 
     # Exceção para caso a revista não exista na lista
     if updated_revista is None:
@@ -50,9 +54,9 @@ def update_revista(revista_titulo: str, revista: RevistaUpdate):
 
 # Rota para atualização parcial dos dados de um revista
 @router.patch("/{revista_titulo}")
-def partial_update_revista(revista_titulo: str, revista: RevistaPatch):
+def partial_update_revista(revista_titulo: str, revista: RevistaPatch, db: DbSession):
     parcial_updated_revista = revistas_service.partial_update_revista(
-        revista_titulo, revista
+        db, revista_titulo, revista
     )
 
     # Exceção para caso a revista não exista na lista
@@ -67,8 +71,8 @@ def partial_update_revista(revista_titulo: str, revista: RevistaPatch):
 
 # Rota para deletar uma revista
 @router.delete("/{revista_titulo}")
-def delete_revista(revista_titulo: str):
-    deletar = revistas_service.delete_revista(revista_titulo)
+def delete_revista(revista_titulo: str, db: DbSession):
+    deletar = revistas_service.delete_revista(db, revista_titulo)
 
     # Exceção para caso a revista não exista na lista
     if not deletar:

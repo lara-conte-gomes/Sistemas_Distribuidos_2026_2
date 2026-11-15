@@ -1,5 +1,5 @@
-from app.api.schemas.revistas_schemas import CriarRevista, RevistaPatch, RevistaUpdate
-from app.api.services import revistas_service
+from app.schemas.revistas_schemas import CriarRevista, RevistaPatch, RevistaUpdate
+from app.services import revistas_service
 
 
 # Funcao de preparacao de testes

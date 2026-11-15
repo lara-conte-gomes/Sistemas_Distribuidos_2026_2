@@ -1,52 +1,54 @@
 from fastapi import status
-from fastapi.testclient import TestClient
 
-from app.api.services import funcionarios_service
-from app.main import app
-
-client = TestClient(app)
-
-
-# Funcao de preparacao de testes
-def setup_function():
-    funcionarios_service.funcionarios.clear()
-    funcionarios_service.funcionarios.append(
-        {
+# Teste de listagem dos funcionarios
+def test_list_funcionario(client):
+    client.get(
+        "/funcionario/",
+        json={
             "nome": "João",
             "idade": 25,
             "cargo": "caixa",
         }
     )
 
-
-# Teste de listagem dos funcionarios
-def test_list_funcionario():
     response = client.get("/funcionario/")
-
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == [
-        {
+
+    funcionarios = response.json()
+
+    assert len(funcionarios) == 1
+    assert funcionarios[0]["nome"] == "João"
+    assert funcionarios[0]["idade"] == 25
+    assert funcionarios[0]["cargo"] == "caixa"
+    assert isinstance(funcionarios[0]["id"], int)
+
+
+# Teste de busca de um funcionario
+def test_get_funcionario(client):
+    created = client.post(
+        "/funcionario/",
+        json={
             "nome": "João",
             "idade": 25,
             "cargo": "caixa",
         }
-    ]
+    )
 
+    funcionario_id = created.json()["id"]
 
-# Teste de busca de um funcionario
-def test_get_funcionario():
-    response = client.get("/funcionario/João")
+    response = client.get("/funcionario/{funcionario_id}")
+
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
+        "id": funcionario_id,
         "nome": "João",
         "idade": 25,
         "cargo": "caixa",
     }
-
-
+    
 # Teste de criacao de um funcionario
-def test_adicionar_funcionario():
+def test_adicionar_funcionario(client):
     response = client.post(
         "/funcionario/",
         json={
@@ -57,17 +59,30 @@ def test_adicionar_funcionario():
     )
 
     assert response.status_code == status.HTTP_201_CREATED
-    assert response.json() == {
-        "nome": "Luiza",
-        "idade": 23,
-        "cargo": "atendente",
-    }
+
+    funcionarios = response.json()
+
+    assert isinstance(funcionarios["id"], int)
+    assert funcionarios[0]["nome"] == "Luiza"
+    assert funcionarios[0]["idade"] == 23
+    assert funcionarios[0]["cargo"] == "atendente"
 
 
 # Teste de atualizacao completa de um funcionario
-def test_update_funcionario():
+def test_update_funcionario(client):
+    created = client.post(
+        "/funcionario/",
+        json={
+            "nome": "João",
+            "idade": 25,
+            "cargo": "caixa",
+        }
+    )
+
+    funcionario_id = created.json()["id"]
+
     response = client.put(
-        "/funcionario/João",
+        f"/funcionario/{funcionario_id}",
         json={
             "nome": "Pedro",
             "idade": 28,
@@ -77,23 +92,29 @@ def test_update_funcionario():
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
+        "id": funcionario_id,
         "nome": "Pedro",
         "idade": 28,
         "cargo": "gerente",
     }
 
-    # assert response.json() == [{
-    #         "nome": "Pedro",
-    #         "idade": 28,
-    #         "cargo": "gerente",
-    #     }
-    # ]
 
 
 # Teste de atualizacao parcial de um funcionario
-def test_partial_update_funcionario():
+def test_partial_update_funcionario(client):
+    created = client.post(
+        "/funcionario/",
+        json={
+            "nome": "João",
+            "idade": 25,
+            "cargo": "caixa",
+        }
+    )
+
+    funcionario_id = created.json()["id"]
+
     response = client.patch(
-        "/funcionario/João",
+        f"/funcionario/{funcionario_id}",
         json={
             "idade": 29,
         },
@@ -101,17 +122,36 @@ def test_partial_update_funcionario():
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
+        "id": funcionario_id,
         "nome": "João",
         "idade": 29,
         "cargo": "caixa",
     }
 
 
-# Teste de remocao de um um funcionario
-def test_delete_funcionario():
-    response = client.delete("/funcionario/João")
+# Teste de remocao de um funcionario
+def test_delete_funcionario(client):
+    created = client.post(
+        "/funcionario/",
+        json={
+            "nome": "João",
+            "idade": 25,
+            "cargo": "caixa",
+        }
+    )
+
+    funcionario_id = created.json()["id"]
+
+    response = client.delete(
+        f"/funcionario/{funcionario_id}",
+    )
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {"mensagem": "O funcionario foi removido com sucesso"}
+    assert response.json() == {
+        "mensagem": "O funcionário foi removido com sucesso"
+    }
 
-    assert funcionarios_service.funcionarios == []
+    #Confirma se foi deletado
+    get_response = client.get(f"/funcionario/{funcionario_id}")
+
+    assert get_response.status_code == status.HTTP_404_NOT_FOUND

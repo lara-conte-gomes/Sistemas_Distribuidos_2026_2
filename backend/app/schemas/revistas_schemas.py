@@ -1,5 +1,5 @@
 # import
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 # Criar a revista
@@ -24,3 +24,12 @@ class RevistaPatch(BaseModel):
     genero: str | None = None
     edicao: str | None = None
     quantidade: int | None = None
+
+#Resposta da API
+class RevistaResposta(BaseModel):
+    titulo: str
+    genero: str
+    edicao: str
+    quantidade: int
+
+    model_config = ConfigDict(from_attributes=True)

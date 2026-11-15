@@ -1,5 +1,5 @@
-from app.api.schemas.livros_schemas import CriarLivro, LivroPatch, LivroUpdate
-from app.api.services import livros_service
+from app.schemas.livros_schemas import CriarLivro, LivroPatch, LivroUpdate
+from app.services import livros_service
 
 
 # Funcao de preparacao de testes

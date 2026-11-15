@@ -1,5 +1,5 @@
 # import
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 # Criar o livro
@@ -24,3 +24,12 @@ class LivroPatch(BaseModel):
     genero: str | None = None
     publico_alvo: str | None = None
     quantidade: int | None = None
+
+#Resposta da API
+class LivroResposta(BaseModel):
+    titulo: str
+    genero: str
+    publico_alvo: str
+    quantidade: int
+
+    model_config = ConfigDict(from_attributes=True)
