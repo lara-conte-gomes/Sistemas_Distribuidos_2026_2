@@ -1,5 +1,6 @@
 from fastapi import status
 
+
 # Teste de listagem das revistas
 def test_list_revista(client):
     created = client.post(
@@ -9,7 +10,7 @@ def test_list_revista(client):
             "genero": "tecnologia",
             "edicao": "Novembro",
             "quantidade": 10,
-        }
+        },
     )
 
     assert created.status_code == status.HTTP_201_CREATED
@@ -20,7 +21,6 @@ def test_list_revista(client):
 
     assert isinstance(revistas[0]["id"], int)
     assert revistas[0]["titulo"] == "Mundo Estranho"
-    
 
 
 # Teste de busca de uma revista
@@ -32,7 +32,7 @@ def test_get_revista(client):
             "genero": "tecnologia",
             "edicao": "Novembro",
             "quantidade": 10,
-        }
+        },
     )
 
     assert created.status_code == status.HTTP_201_CREATED
@@ -41,10 +41,10 @@ def test_get_revista(client):
 
     response = client.get(f"/revista/{revista_id}")
 
-
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["titulo"] == "Mundo Estranho"
-    
+
+
 # Teste de criacao de uma revista
 def test_adicionar_revista(client):
     response = client.post(
@@ -77,7 +77,7 @@ def test_update_revista(client):
             "genero": "tecnologia",
             "edicao": "Novembro",
             "quantidade": 10,
-        }
+        },
     )
 
     assert created.status_code == status.HTTP_201_CREATED
@@ -109,7 +109,7 @@ def test_partial_update_revista(client):
             "genero": "tecnologia",
             "edicao": "Novembro",
             "quantidade": 10,
-        }
+        },
     )
 
     assert created.status_code == status.HTTP_201_CREATED
@@ -136,7 +136,7 @@ def test_delete_revista(client):
             "genero": "tecnologia",
             "edicao": "Novembro",
             "quantidade": 10,
-        }
+        },
     )
 
     assert created.status_code == status.HTTP_201_CREATED
@@ -147,13 +147,9 @@ def test_delete_revista(client):
     )
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {
-        "mensagem": "A revista foi removida com sucesso"
-    }
+    assert response.json() == {"mensagem": "A revista foi removida com sucesso"}
 
-    #Confirma se foi deletada
+    # Confirma se foi deletada
     get_response = client.get(f"/revista/{revista_id}")
 
     assert get_response.status_code == status.HTTP_404_NOT_FOUND
-
-

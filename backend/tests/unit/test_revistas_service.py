@@ -11,18 +11,20 @@ from app.services import revistas_service
 # Teste de listagem das revistas
 def test_list_revista():
     db = MagicMock()
-    expected_revistas = [{
-        "titulo": "Mundo Estranho",
-        "genero": "tecnologia",
-        "edicao": "Novembro",
-        "quantidade": 10,
-    }]
+    expected_revistas = [
+        {
+            "titulo": "Mundo Estranho",
+            "genero": "tecnologia",
+            "edicao": "Novembro",
+            "quantidade": 10,
+        }
+    ]
 
     with patch.object(
         revistas_service.revistas_rst,
         "list_revistas",
         return_value=expected_revistas,
-    )as mock_repository:
+    ) as mock_repository:
         result = revistas_service.lista_revistas(db)
 
     assert result == expected_revistas
@@ -32,18 +34,20 @@ def test_list_revista():
 # Teste de busca de uma revista
 def test_get_revista():
     db = MagicMock()
-    expected_revistas = [{
-        "titulo": "Mundo Estranho",
-        "genero": "tecnologia",
-        "edicao": "Novembro",
-        "quantidade": 10,
-    }]
+    expected_revistas = [
+        {
+            "titulo": "Mundo Estranho",
+            "genero": "tecnologia",
+            "edicao": "Novembro",
+            "quantidade": 10,
+        }
+    ]
 
     with patch.object(
         revistas_service.revistas_rst,
         "get_revista",
         return_value=expected_revistas,
-    )as mock_repository:
+    ) as mock_repository:
         result = revistas_service.get_revista(db, 1)
 
     assert result == expected_revistas
@@ -73,7 +77,7 @@ def test_adicionar_revistas():
         revistas_service.revistas_rst,
         "adicionar_revista",
         return_value=expected_revistas,
-    )as mock_repository:
+    ) as mock_repository:
         result = revistas_service.adicionar_revista(db, revista)
 
     assert result == expected_revistas
@@ -85,6 +89,7 @@ def test_adicionar_revistas():
         quantidade=35,
     )
 
+
 # Teste de atualizacao completa de uma revista
 def test_update_revista():
     db = MagicMock()
@@ -92,8 +97,8 @@ def test_update_revista():
     revista = RevistaUpdate(
         titulo="Super Interessante",
         genero="curiosidades",
-        edicao= "Abril",
-        quantidade= 14,
+        edicao="Abril",
+        quantidade=14,
     )
 
     expected_revista = {
@@ -108,7 +113,7 @@ def test_update_revista():
         revistas_service.revistas_rst,
         "update_revista",
         return_value=expected_revista,
-    )as mock_repository:
+    ) as mock_repository:
         result = revistas_service.update_revista(db, 1, revista)
 
     assert result == expected_revista
@@ -120,7 +125,7 @@ def test_update_revista():
             "genero": "curiosidades",
             "edicao": "Abril",
             "quantidade": 14,
-        }
+        },
     )
 
 
@@ -144,7 +149,7 @@ def test_partial_update_revista():
         revistas_service.revistas_rst,
         "update_revista",
         return_value=expected_revistas,
-    )as mock_repository:
+    ) as mock_repository:
         result = revistas_service.partial_update_revista(db, 1, revista)
 
     assert result == expected_revistas
@@ -153,7 +158,7 @@ def test_partial_update_revista():
         1,
         {
             "quantidade": 55,
-        }
+        },
     )
 
 
@@ -165,7 +170,7 @@ def test_delete_revista():
         revistas_service.revistas_rst,
         "delete_revista",
         return_value=True,
-    )as mock_repository:
+    ) as mock_repository:
         result = revistas_service.delete_revista(db, 1)
 
     assert result is True

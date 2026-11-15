@@ -1,11 +1,12 @@
-#imports 
+# imports
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.base import Base
 
+
 class Livro(Base):
-    __tablename__="livros"
+    __tablename__ = "livros"
 
     id: Mapped[int] = mapped_column(
         Integer,

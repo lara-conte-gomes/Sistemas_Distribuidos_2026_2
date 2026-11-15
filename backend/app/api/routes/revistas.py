@@ -1,14 +1,16 @@
 from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.database.session import get_db
 
+from app.database.session import get_db
 from app.schemas.revistas_schemas import CriarRevista, RevistaPatch, RevistaUpdate
 from app.services import revistas_service
 
 router = APIRouter(prefix="/revista", tags=["Revista"])
 
 DbSession = Annotated[Session, Depends(get_db)]
+
 
 # Rota para mostrar a lista de revistas que tem na loja
 @router.get("/")

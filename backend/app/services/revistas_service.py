@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.repositories import revistas_repositories as revistas_rst
 from app.schemas.revistas_schemas import CriarRevista, RevistaPatch, RevistaUpdate
 
+
 # Funcao para retornar a lista de revistas
 def lista_revistas(db: Session):
     return revistas_rst.list_revistas(db)
@@ -31,6 +32,7 @@ def update_revista(db: Session, revista_id: int, revista: RevistaUpdate):
         revista_id,
         revista.model_dump(exclude_unset=True),
     )
+
 
 # Funcao para atualizar parcialmente as informacoes de uma revista
 def partial_update_revista(db: Session, revista_id: int, revista: RevistaPatch):

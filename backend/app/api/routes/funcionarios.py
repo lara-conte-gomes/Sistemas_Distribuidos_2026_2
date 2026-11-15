@@ -1,8 +1,9 @@
 from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.database.session import get_db
 
+from app.database.session import get_db
 from app.schemas.funcionarios_schemas import (
     CriarFuncionario,
     FuncionarioPatch,
@@ -13,6 +14,7 @@ from app.services import funcionarios_service
 router = APIRouter(prefix="/funcionario", tags=["Funcionarios"])
 
 DbSession = Annotated[Session, Depends(get_db)]
+
 
 # Rota para mostrar a lista de funcionarios que trabalham na loja
 @router.get("/")
@@ -43,7 +45,9 @@ def adicionar_funcionario(funcionario: CriarFuncionario, db: DbSession):
 
 # Rota para atualizar um funcionario
 @router.put("/{funcionario_id}")
-def update_funcionario(funcionario_id: int, funcionario: FuncionarioUpdate, db: DbSession):
+def update_funcionario(
+    funcionario_id: int, funcionario: FuncionarioUpdate, db: DbSession
+):
     updated_funcionario = funcionarios_service.update_funcionario(
         db, funcionario_id, funcionario
     )
@@ -60,7 +64,9 @@ def update_funcionario(funcionario_id: int, funcionario: FuncionarioUpdate, db: 
 
 # Rota para atualização parcial dos dados de um funcionario
 @router.patch("/{funcionario_id}")
-def partial_update_funcionario(funcionario_id: int, funcionario: FuncionarioPatch, db: DbSession):
+def partial_update_funcionario(
+    funcionario_id: int, funcionario: FuncionarioPatch, db: DbSession
+):
     parcial_updated_funcionario = funcionarios_service.partial_update_funcionario(
         db, funcionario_id, funcionario
     )

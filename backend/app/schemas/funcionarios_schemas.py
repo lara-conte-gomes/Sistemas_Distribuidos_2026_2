@@ -22,7 +22,8 @@ class FuncionarioPatch(BaseModel):
     idade: int | None = None
     cargo: str | None = None
 
-#Resposta da API
+
+# Resposta da API
 class FuncionarioResposta(BaseModel):
     nome: str
     idade: int

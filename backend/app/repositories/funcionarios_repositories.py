@@ -3,18 +3,21 @@ from sqlalchemy.orm import Session
 
 from app.models.funcionarios_models import Funcionario
 
-#Ver a lista de funcionarios
+
+# Ver a lista de funcionarios
 def list_funcionarios(db: Session):
     statement = select(Funcionario)
     return db.scalars(statement).all()
 
-#Buscar um funcionario
+
+# Buscar um funcionario
 def get_funcionario(db: Session, funcionario_id: int):
     return db.get(Funcionario, funcionario_id)
 
-#Adicionar um funcionario
+
+# Adicionar um funcionario
 def adicionar_funcionario(db: Session, nome: str, idade: int, cargo: str):
-    novo_funcionario= Funcionario(
+    novo_funcionario = Funcionario(
         nome=nome,
         idade=idade,
         cargo=cargo,
@@ -26,8 +29,9 @@ def adicionar_funcionario(db: Session, nome: str, idade: int, cargo: str):
 
     return novo_funcionario
 
-#Atualizar os dados do funcionario
-def update_funcionario(db: Session, funcionario_id, data:dict):
+
+# Atualizar os dados do funcionario
+def update_funcionario(db: Session, funcionario_id, data: dict):
     funcionario = get_funcionario(db, funcionario_id)
 
     if funcionario is None:
@@ -41,7 +45,8 @@ def update_funcionario(db: Session, funcionario_id, data:dict):
 
     return funcionario
 
-#Deletar um funcionario
+
+# Deletar um funcionario
 def delete_funcionario(db: Session, funcionario_id):
     funcionario = get_funcionario(db, funcionario_id)
 

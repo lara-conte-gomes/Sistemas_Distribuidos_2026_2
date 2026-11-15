@@ -25,7 +25,8 @@ class RevistaPatch(BaseModel):
     edicao: str | None = None
     quantidade: int | None = None
 
-#Resposta da API
+
+# Resposta da API
 class RevistaResposta(BaseModel):
     titulo: str
     genero: str

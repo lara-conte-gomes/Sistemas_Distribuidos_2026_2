@@ -25,7 +25,8 @@ class LivroPatch(BaseModel):
     publico_alvo: str | None = None
     quantidade: int | None = None
 
-#Resposta da API
+
+# Resposta da API
 class LivroResposta(BaseModel):
     titulo: str
     genero: str

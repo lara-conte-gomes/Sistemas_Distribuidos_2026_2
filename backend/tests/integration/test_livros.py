@@ -1,15 +1,16 @@
 from fastapi import status
 
+
 # Teste de listagem dos livros
 def test_list_livro(client):
-    created= client.post(
+    created = client.post(
         "/livro/",
         json={
             "titulo": "A Bússola de Ouro",
             "genero": "aventura",
             "publico_alvo": "jovens",
             "quantidade": 10,
-        }
+        },
     )
 
     assert created.status_code == status.HTTP_201_CREATED
@@ -22,7 +23,6 @@ def test_list_livro(client):
     assert livros[0]["titulo"] == "A Bússola de Ouro"
 
 
-
 # Teste de busca de um livro
 def test_get_livro(client):
     created = client.post(
@@ -32,7 +32,7 @@ def test_get_livro(client):
             "genero": "aventura",
             "publico_alvo": "jovens",
             "quantidade": 10,
-        }
+        },
     )
 
     assert created.status_code == status.HTTP_201_CREATED
@@ -40,10 +40,10 @@ def test_get_livro(client):
 
     response = client.get(f"/livro/{livro_id}")
 
-
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["titulo"] == "A Bússola de Ouro"
-    
+
+
 # Teste de criacao de um livro
 def test_adicionar_livro(client):
     response = client.post(
@@ -76,7 +76,7 @@ def test_update_livro(client):
             "genero": "aventura",
             "publico_alvo": "jovens",
             "quantidade": 10,
-        }
+        },
     )
 
     assert created.status_code == status.HTTP_201_CREATED
@@ -108,7 +108,7 @@ def test_partial_update_livro(client):
             "genero": "aventura",
             "publico_alvo": "jovens",
             "quantidade": 10,
-        }
+        },
     )
 
     assert created.status_code == status.HTTP_201_CREATED
@@ -136,7 +136,7 @@ def test_delete_livro(client):
             "genero": "aventura e fantasia",
             "publico_alvo": "jovens",
             "quantidade": 10,
-        }
+        },
     )
 
     assert created.status_code == status.HTTP_201_CREATED
@@ -147,11 +147,9 @@ def test_delete_livro(client):
     )
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {
-        "mensagem": "O livro foi removido com sucesso"
-    }
+    assert response.json() == {"mensagem": "O livro foi removido com sucesso"}
 
-    #Confirma se foi deletado
+    # Confirma se foi deletado
     get_response = client.get(f"/livro/{livro_id}")
 
     assert get_response.status_code == status.HTTP_404_NOT_FOUND

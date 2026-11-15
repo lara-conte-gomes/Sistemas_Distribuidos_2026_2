@@ -11,18 +11,20 @@ from app.services import livros_service
 # Teste de listagem dos livros
 def test_list_livro():
     db = MagicMock()
-    expected_livros = [{
-        "titulo": "A Bússola de Ouro",
-        "genero": "aventura e fantasia",
-        "publico_alvo": "jovens",
-        "quantidade": 10,
-    }]
+    expected_livros = [
+        {
+            "titulo": "A Bússola de Ouro",
+            "genero": "aventura e fantasia",
+            "publico_alvo": "jovens",
+            "quantidade": 10,
+        }
+    ]
 
     with patch.object(
         livros_service.livro_rst,
         "list_livros",
         return_value=expected_livros,
-    )as mock_repository:
+    ) as mock_repository:
         result = livros_service.lista_livro(db)
 
     assert result == expected_livros
@@ -32,18 +34,20 @@ def test_list_livro():
 # Teste de busca de um livro
 def test_get_livro():
     db = MagicMock()
-    expected_livros = [{
-        "titulo": "A Bússola de Ouro",
-        "genero": "aventura e fantasia",
-        "publico_alvo": "jovens",
-        "quantidade": 10,
-    }]
+    expected_livros = [
+        {
+            "titulo": "A Bússola de Ouro",
+            "genero": "aventura e fantasia",
+            "publico_alvo": "jovens",
+            "quantidade": 10,
+        }
+    ]
 
     with patch.object(
         livros_service.livro_rst,
         "get_livro",
         return_value=expected_livros,
-    )as mock_repository:
+    ) as mock_repository:
         result = livros_service.get_livro(db, 1)
 
     assert result == expected_livros
@@ -57,14 +61,14 @@ def test_adicionar_livros():
     livro = CriarLivro(
         titulo="Desventuras em Série",
         genero="aventura",
-        publico_alvo= "todas as idades",
-        quantidade= 30,
+        publico_alvo="todas as idades",
+        quantidade=30,
     )
 
     expected_livros = {
         "id": 1,
         "titulo": "Desventuras em Série",
-         "genero": "aventura",
+        "genero": "aventura",
         "publico_alvo": "todas as idades",
         "quantidade": 30,
     }
@@ -73,7 +77,7 @@ def test_adicionar_livros():
         livros_service.livro_rst,
         "adicionar_livro",
         return_value=expected_livros,
-    )as mock_repository:
+    ) as mock_repository:
         result = livros_service.adicionar_livro(db, livro)
 
     assert result == expected_livros
@@ -81,9 +85,10 @@ def test_adicionar_livros():
         db,
         titulo="Desventuras em Série",
         genero="aventura",
-        publico_alvo= "todas as idades",
-        quantidade= 30,
+        publico_alvo="todas as idades",
+        quantidade=30,
     )
+
 
 # Teste de atualizacao completa de um livro
 def test_update_livro():
@@ -92,8 +97,8 @@ def test_update_livro():
     livro = LivroUpdate(
         titulo="Coração de Tinta",
         genero="ação",
-        publico_alvo= "todas as idades",
-        quantidade= 50,
+        publico_alvo="todas as idades",
+        quantidade=50,
     )
 
     expected_livro = {
@@ -108,7 +113,7 @@ def test_update_livro():
         livros_service.livro_rst,
         "update_livro",
         return_value=expected_livro,
-    )as mock_repository:
+    ) as mock_repository:
         result = livros_service.update_livro(db, 1, livro)
 
     assert result == expected_livro
@@ -120,7 +125,7 @@ def test_update_livro():
             "genero": "ação",
             "publico_alvo": "todas as idades",
             "quantidade": 50,
-        }
+        },
     )
 
 
@@ -128,9 +133,7 @@ def test_update_livro():
 def test_partial_update_livro():
     db = MagicMock()
 
-    livro = LivroPatch(
-        genero="aventura e fantasia"
-    )
+    livro = LivroPatch(genero="aventura e fantasia")
 
     expected_livros = {
         "id": 1,
@@ -144,7 +147,7 @@ def test_partial_update_livro():
         livros_service.livro_rst,
         "update_livro",
         return_value=expected_livros,
-    )as mock_repository:
+    ) as mock_repository:
         result = livros_service.partial_update_livro(db, 1, livro)
 
     assert result == expected_livros
@@ -153,7 +156,7 @@ def test_partial_update_livro():
         1,
         {
             "genero": "aventura e fantasia",
-        }
+        },
     )
 
 
@@ -165,7 +168,7 @@ def test_delete_livro():
         livros_service.livro_rst,
         "delete_livro",
         return_value=True,
-    )as mock_repository:
+    ) as mock_repository:
         result = livros_service.delete_livro(db, 1)
 
     assert result is True

@@ -1,14 +1,16 @@
 from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.database.session import get_db
 
+from app.database.session import get_db
 from app.schemas.livros_schemas import CriarLivro, LivroPatch, LivroUpdate
 from app.services import livros_service
 
 router = APIRouter(prefix="/livro", tags=["Livros"])
 
 DbSession = Annotated[Session, Depends(get_db)]
+
 
 # Rota para mostrar a lista de livros que exitem na loja
 @router.get("/")
