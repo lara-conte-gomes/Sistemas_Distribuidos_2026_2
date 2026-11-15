@@ -6,20 +6,20 @@ from app.database.session import get_db
 from app.schemas.livros_schemas import CriarLivro, LivroPatch, LivroUpdate
 from app.services import livros_service
 
-router = APIRouter(prefix="/livros", tags=["Livros"])
+router = APIRouter(prefix="/livro", tags=["Livros"])
 
 DbSession = Annotated[Session, Depends(get_db)]
 
 # Rota para mostrar a lista de livros que exitem na loja
 @router.get("/")
 def lista_livros(db: DbSession):
-    return livros_service.lista_livros(db)
+    return livros_service.lista_livro(db)
 
 
 # Rota para buscar um livro específico
-@router.get("/{livro_titulo}")
-def get_livro(livro_titulo: str, db: DbSession):
-    livro = livros_service.get_livro(db, livro_titulo)
+@router.get("/{livro_id}")
+def get_livro(livro_id: int, db: DbSession):
+    livro = livros_service.get_livro(db, livro_id)
 
     # Exceção para caso o livro não exista na lista
     if livro is None:
@@ -38,9 +38,9 @@ def adicionar_livro(livro: CriarLivro, db: DbSession):
 
 
 # Rota para atualizar um livro
-@router.put("/{livro_titulo}")
-def update_livro(livro_titulo: str, livro: LivroUpdate, db: DbSession):
-    updated_livro = livros_service.update_livro(db, livro_titulo, livro)
+@router.put("/{livro_id}")
+def update_livro(livro_id: int, livro: LivroUpdate, db: DbSession):
+    updated_livro = livros_service.update_livro(db, livro_id, livro)
 
     # Exceção para caso o livro não exista na lista
     if updated_livro is None:
@@ -53,9 +53,9 @@ def update_livro(livro_titulo: str, livro: LivroUpdate, db: DbSession):
 
 
 # Rota para atualização parcial dos dados de um livro
-@router.patch("/{livro_titulo}")
-def partial_update_livro(livro_titulo: str, livro: LivroPatch, db: DbSession):
-    parcial_updated_livro = livros_service.partial_update_livro(db, livro_titulo, livro)
+@router.patch("/{livro_id}")
+def partial_update_livro(livro_id: int, livro: LivroPatch, db: DbSession):
+    parcial_updated_livro = livros_service.partial_update_livro(db, livro_id, livro)
 
     # Exceção para caso o livro não exista na lista
     if parcial_updated_livro is None:
@@ -68,9 +68,9 @@ def partial_update_livro(livro_titulo: str, livro: LivroPatch, db: DbSession):
 
 
 # Rota para deletar um livro
-@router.delete("/{livro_titulo}")
-def delete_livro(livro_titulo: str, db: DbSession):
-    deletar = livros_service.delete_livro(db, livro_titulo)
+@router.delete("/{livro_id}")
+def delete_livro(livro_id: int, db: DbSession):
+    deletar = livros_service.delete_livro(db, livro_id)
 
     # Exceção para caso o livro não exista na lista
     if not deletar:

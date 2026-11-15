@@ -4,7 +4,7 @@ from app.repositories import revistas_repositories as revistas_rst
 from app.schemas.revistas_schemas import CriarRevista, RevistaPatch, RevistaUpdate
 
 # Funcao para retornar a lista de revistas
-def lista_revista(db: Session):
+def lista_revistas(db: Session):
     return revistas_rst.list_revistas(db)
 
 
@@ -43,4 +43,4 @@ def partial_update_revista(db: Session, revista_id: int, revista: RevistaPatch):
 
 # Funcao para deletar uma revista
 def delete_revista(db: Session, revista_id: int):
-    return revistas_rst.deletar_revista(db, revista_id)
+    return revistas_rst.delete_revista(db, revista_id)

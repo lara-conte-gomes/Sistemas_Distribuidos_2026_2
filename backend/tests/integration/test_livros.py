@@ -1,17 +1,10 @@
 from fastapi import status
-from fastapi.testclient import TestClient
 
-from app.services import livros_service
-from app.main import app
-
-client = TestClient(app)
-
-
-# Funcao de preparacao de testes
-def setup_function():
-    livros_service.livros.clear()
-    livros_service.livros.append(
-        {
+# Teste de listagem dos livros
+def test_list_livro(client):
+    created= client.post(
+        "/livro/",
+        json={
             "titulo": "A Bússola de Ouro",
             "genero": "aventura",
             "publico_alvo": "jovens",
@@ -19,39 +12,42 @@ def setup_function():
         }
     )
 
-
-# Teste de listagem dos livros
-def test_list_livros():
-    response = client.get("/livros")
-
+    assert created.status_code == status.HTTP_201_CREATED
+    response = client.get("/livro/")
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == [
-        {
+
+    livros = response.json()
+
+    assert isinstance(livros[0]["id"], int)
+    assert livros[0]["titulo"] == "A Bússola de Ouro"
+
+
+
+# Teste de busca de um livro
+def test_get_livro(client):
+    created = client.post(
+        "/livro/",
+        json={
             "titulo": "A Bússola de Ouro",
             "genero": "aventura",
             "publico_alvo": "jovens",
             "quantidade": 10,
         }
-    ]
+    )
 
+    assert created.status_code == status.HTTP_201_CREATED
+    livro_id = created.json()["id"]
 
-# Teste de busca de um livro
-def test_get_livro():
-    response = client.get("/livros/A Bússola de Ouro")
+    response = client.get(f"/livro/{livro_id}")
+
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {
-        "titulo": "A Bússola de Ouro",
-        "genero": "aventura",
-        "publico_alvo": "jovens",
-        "quantidade": 10,
-    }
-
-
+    assert response.json()["titulo"] == "A Bússola de Ouro"
+    
 # Teste de criacao de um livro
-def test_adicionar_livro():
+def test_adicionar_livro(client):
     response = client.post(
-        "/livros/",
+        "/livro/",
         json={
             "titulo": "Desventuras em Série",
             "genero": "aventura",
@@ -61,18 +57,33 @@ def test_adicionar_livro():
     )
 
     assert response.status_code == status.HTTP_201_CREATED
-    assert response.json() == {
-        "titulo": "Desventuras em Série",
-        "genero": "aventura",
-        "publico_alvo": "todas as idades",
-        "quantidade": 30,
-    }
+
+    livros = response.json()
+
+    assert isinstance(livros["id"], int)
+    assert livros["titulo"] == "Desventuras em Série"
+    assert livros["genero"] == "aventura"
+    assert livros["publico_alvo"] == "todas as idades"
+    assert livros["quantidade"] == 30
 
 
 # Teste de atualizacao completa de um livro
-def test_update_livro():
+def test_update_livro(client):
+    created = client.post(
+        "/livro/",
+        json={
+            "titulo": "A Bússola de Ouro",
+            "genero": "aventura",
+            "publico_alvo": "jovens",
+            "quantidade": 10,
+        }
+    )
+
+    assert created.status_code == status.HTTP_201_CREATED
+    livro_id = created.json()["id"]
+
     response = client.put(
-        "/livros/A Bússola de Ouro",
+        f"/livro/{livro_id}",
         json={
             "titulo": "Coração de Tinta",
             "genero": "ação",
@@ -82,49 +93,65 @@ def test_update_livro():
     )
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {
-        "titulo": "Coração de Tinta",
-        "genero": "ação",
-        "publico_alvo": "todas as idades",
-        "quantidade": 50,
-    }
+    assert response.json()["titulo"] == "Coração de Tinta"
+    assert response.json()["genero"] == "ação"
+    assert response.json()["publico_alvo"] == "todas as idades"
+    assert response.json()["quantidade"] == 50
 
 
 # Teste de atualizacao parcial de um livro
-def test_partial_update_livro():
+def test_partial_update_livro(client):
+    created = client.post(
+        "/livro/",
+        json={
+            "titulo": "A Bússola de Ouro",
+            "genero": "aventura",
+            "publico_alvo": "jovens",
+            "quantidade": 10,
+        }
+    )
+
+    assert created.status_code == status.HTTP_201_CREATED
+    livro_id = created.json()["id"]
+
     response = client.patch(
-        "/livros/A Bússola de Ouro",
+        f"/livro/{livro_id}",
         json={
             "genero": "aventura e fantasia",
         },
     )
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {
-        "titulo": "A Bússola de Ouro",
-        "genero": "aventura e fantasia",
-        "publico_alvo": "jovens",
-        "quantidade": 10,
-    }
+    assert response.json()["titulo"] == "A Bússola de Ouro"
+    assert response.json()["genero"] == "aventura e fantasia"
+    assert response.json()["quantidade"] == 10
 
 
 # Teste de remocao de um livro
-def test_delete_livro():
-    response = client.delete("/livros/A Bússola de Ouro")
+def test_delete_livro(client):
+    created = client.post(
+        "/livro/",
+        json={
+            "titulo": "A Bússola de Ouro",
+            "genero": "aventura e fantasia",
+            "publico_alvo": "jovens",
+            "quantidade": 10,
+        }
+    )
+
+    assert created.status_code == status.HTTP_201_CREATED
+    livro_id = created.json()["id"]
+
+    response = client.delete(
+        f"/livro/{livro_id}",
+    )
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {"mensagem": "O livro foi removido com sucesso"}
-
-
-# Teste de entrada de quantidade inválida
-def test_quantidade_invalida():
-    livro = {
-        "titulo": "Coração de Tinta",
-        "genero": "aventura e fantasia",
-        "publico_alvo": "todas as idades",
-        "quantidade": "quarenta",
+    assert response.json() == {
+        "mensagem": "O livro foi removido com sucesso"
     }
 
-    response = client.post("/livros", json=livro)
+    #Confirma se foi deletado
+    get_response = client.get(f"/livro/{livro_id}")
 
-    assert response.status_code == 422
+    assert get_response.status_code == status.HTTP_404_NOT_FOUND

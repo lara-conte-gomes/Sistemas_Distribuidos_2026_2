@@ -1,20 +1,20 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models.livros_models import Livros
+from app.models.livros_models import Livro
 
 #Ver a lista de livros
 def list_livros(db: Session):
-    statement = select(Livros)
+    statement = select(Livro)
     return db.scalars(statement).all()
 
 #Buscar um livro
 def get_livro(db: Session, livro_id: int):
-    return db.get(Livros, livro_id)
+    return db.get(Livro, livro_id)
 
 #Adicionar um livro
 def adicionar_livro(db: Session, titulo: str, genero: str, publico_alvo: str, quantidade: int):
-    novo_livro= Livros(
+    novo_livro= Livro(
         titulo=titulo,
         genero=genero,
         publico_alvo=publico_alvo,
@@ -34,7 +34,7 @@ def update_livro(db: Session, livro_id, data:dict):
     if livro is None:
         return None
 
-    for field, value in data.livros():
+    for field, value in data.items():
         setattr(livro, field, value)
 
     db.commit()
@@ -43,7 +43,7 @@ def update_livro(db: Session, livro_id, data:dict):
     return livro
 
 #Deletar um livro
-def update_livro(db: Session, livro_id):
+def delete_livro(db: Session, livro_id):
     livro = get_livro(db, livro_id)
 
     if livro is None:
@@ -52,4 +52,4 @@ def update_livro(db: Session, livro_id):
     db.delete(livro)
     db.commit()
 
-    return livro
+    return True

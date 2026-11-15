@@ -17,9 +17,9 @@ def lista_revistas(db: DbSession):
 
 
 # Rota para buscar uma revista específica
-@router.get("/{revista_titulo}")
-def get_revista(revista_titulo: str, db: DbSession):
-    revista = revistas_service.get_revista(db, revista_titulo)
+@router.get("/{revista_id}")
+def get_revista(revista_id: int, db: DbSession):
+    revista = revistas_service.get_revista(db, revista_id)
 
     # Exceção para caso a revista não exista na lista
     if revista is None:
@@ -38,9 +38,9 @@ def adicionar_revista(revista: CriarRevista, db: DbSession):
 
 
 # Rota para atualizar uma revista
-@router.put("/{revista_titulo}")
-def update_revista(revista_titulo: str, revista: RevistaUpdate, db: DbSession):
-    updated_revista = revistas_service.update_revista(db, revista_titulo, revista)
+@router.put("/{revista_id}")
+def update_revista(revista_id: int, revista: RevistaUpdate, db: DbSession):
+    updated_revista = revistas_service.update_revista(db, revista_id, revista)
 
     # Exceção para caso a revista não exista na lista
     if updated_revista is None:
@@ -53,10 +53,10 @@ def update_revista(revista_titulo: str, revista: RevistaUpdate, db: DbSession):
 
 
 # Rota para atualização parcial dos dados de um revista
-@router.patch("/{revista_titulo}")
-def partial_update_revista(revista_titulo: str, revista: RevistaPatch, db: DbSession):
+@router.patch("/{revista_id}")
+def partial_update_revista(revista_id: int, revista: RevistaPatch, db: DbSession):
     parcial_updated_revista = revistas_service.partial_update_revista(
-        db, revista_titulo, revista
+        db, revista_id, revista
     )
 
     # Exceção para caso a revista não exista na lista
@@ -70,9 +70,9 @@ def partial_update_revista(revista_titulo: str, revista: RevistaPatch, db: DbSes
 
 
 # Rota para deletar uma revista
-@router.delete("/{revista_titulo}")
-def delete_revista(revista_titulo: str, db: DbSession):
-    deletar = revistas_service.delete_revista(db, revista_titulo)
+@router.delete("/{revista_id}")
+def delete_revista(revista_id: int, db: DbSession):
+    deletar = revistas_service.delete_revista(db, revista_id)
 
     # Exceção para caso a revista não exista na lista
     if not deletar:

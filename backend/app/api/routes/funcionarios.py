@@ -21,9 +21,9 @@ def lista_funcionarios(db: DbSession):
 
 
 # Rota para buscar um funcionario específico
-@router.get("/{funcionario_nome}")
-def get_funcionario(funcionario_nome: str, db: DbSession):
-    funcionario = funcionarios_service.get_funcionario(db, funcionario_nome)
+@router.get("/{funcionario_id}")
+def get_funcionario(funcionario_id: int, db: DbSession):
+    funcionario = funcionarios_service.get_funcionario(db, funcionario_id)
 
     # Exceção para caso o funcionario não exista na lista
     if funcionario is None:
@@ -42,10 +42,10 @@ def adicionar_funcionario(funcionario: CriarFuncionario, db: DbSession):
 
 
 # Rota para atualizar um funcionario
-@router.put("/{funcionario_nome}")
-def update_funcionario(funcionario_nome: str, funcionario: FuncionarioUpdate, db: DbSession):
+@router.put("/{funcionario_id}")
+def update_funcionario(funcionario_id: int, funcionario: FuncionarioUpdate, db: DbSession):
     updated_funcionario = funcionarios_service.update_funcionario(
-        db, funcionario_nome, funcionario
+        db, funcionario_id, funcionario
     )
 
     # Exceção para caso o funcionario não exista na lista
@@ -59,10 +59,10 @@ def update_funcionario(funcionario_nome: str, funcionario: FuncionarioUpdate, db
 
 
 # Rota para atualização parcial dos dados de um funcionario
-@router.patch("/{funcionario_nome}")
-def partial_update_funcionario(funcionario_nome: str, funcionario: FuncionarioPatch, db: DbSession):
+@router.patch("/{funcionario_id}")
+def partial_update_funcionario(funcionario_id: int, funcionario: FuncionarioPatch, db: DbSession):
     parcial_updated_funcionario = funcionarios_service.partial_update_funcionario(
-        db, funcionario_nome, funcionario
+        db, funcionario_id, funcionario
     )
 
     # Exceção para caso o funcionario não exista na lista
@@ -76,9 +76,9 @@ def partial_update_funcionario(funcionario_nome: str, funcionario: FuncionarioPa
 
 
 # Rota para deletar um funcionario
-@router.delete("/{funcionario_nome}")
-def delete_funcionario(funcionario_nome: str, db: DbSession):
-    deletar = funcionarios_service.delete_funcionario(db, funcionario_nome)
+@router.delete("/{funcionario_id}")
+def delete_funcionario(funcionario_id: int, db: DbSession):
+    deletar = funcionarios_service.delete_funcionario(db, funcionario_id)
 
     # Exceção para caso o funcionario não exista na lista
     if not deletar:

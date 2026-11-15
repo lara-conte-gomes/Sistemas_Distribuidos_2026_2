@@ -5,7 +5,8 @@ description = "Backend do Projeto de Laboratório de Sistemas Distribuídos"
 requires-python = ">=3.10,<4.0"
 dependencies = [
     "fastapi",
-    "uvicorn"
+    "uvicorn",
+    "alembic (>=1.20.1,<2.0.0)"
 ]
 
 [tool.poetry]

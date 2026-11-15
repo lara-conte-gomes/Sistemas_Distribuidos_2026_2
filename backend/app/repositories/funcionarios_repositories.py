@@ -42,7 +42,7 @@ def update_funcionario(db: Session, funcionario_id, data:dict):
     return funcionario
 
 #Deletar um funcionario
-def update_funcionario(db: Session, funcionario_id):
+def delete_funcionario(db: Session, funcionario_id):
     funcionario = get_funcionario(db, funcionario_id)
 
     if funcionario is None:
@@ -51,4 +51,4 @@ def update_funcionario(db: Session, funcionario_id):
     db.delete(funcionario)
     db.commit()
 
-    return funcionario
+    return True

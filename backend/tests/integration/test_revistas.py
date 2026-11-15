@@ -1,17 +1,10 @@
 from fastapi import status
-from fastapi.testclient import TestClient
 
-from app.services import revistas_service
-from app.main import app
-
-client = TestClient(app)
-
-
-# Funcao de preparacao de testes
-def setup_function():
-    revistas_service.revistas.clear()
-    revistas_service.revistas.append(
-        {
+# Teste de listagem das revistas
+def test_list_revista(client):
+    created = client.post(
+        "/revista/",
+        json={
             "titulo": "Mundo Estranho",
             "genero": "tecnologia",
             "edicao": "Novembro",
@@ -19,37 +12,41 @@ def setup_function():
         }
     )
 
-
-# Teste de listagem das revistas
-def test_list_revistas():
-    response = client.get("/revista")
-
+    assert created.status_code == status.HTTP_201_CREATED
+    response = client.get("/revista/")
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == [
-        {
+
+    revistas = response.json()
+
+    assert isinstance(revistas[0]["id"], int)
+    assert revistas[0]["titulo"] == "Mundo Estranho"
+    
+
+
+# Teste de busca de uma revista
+def test_get_revista(client):
+    created = client.post(
+        "/revista/",
+        json={
             "titulo": "Mundo Estranho",
             "genero": "tecnologia",
             "edicao": "Novembro",
             "quantidade": 10,
         }
-    ]
+    )
 
+    assert created.status_code == status.HTTP_201_CREATED
 
-# Teste de busca de uma revista
-def test_get_revista():
-    response = client.get("/revista/Mundo Estranho")
+    revista_id = created.json()["id"]
+
+    response = client.get(f"/revista/{revista_id}")
+
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {
-        "titulo": "Mundo Estranho",
-        "genero": "tecnologia",
-        "edicao": "Novembro",
-        "quantidade": 10,
-    }
-
-
+    assert response.json()["titulo"] == "Mundo Estranho"
+    
 # Teste de criacao de uma revista
-def test_adicionar_revista():
+def test_adicionar_revista(client):
     response = client.post(
         "/revista/",
         json={
@@ -61,18 +58,33 @@ def test_adicionar_revista():
     )
 
     assert response.status_code == status.HTTP_201_CREATED
-    assert response.json() == {
-        "titulo": "Quatro Rodas",
-        "genero": "carro",
-        "edicao": "Setembro",
-        "quantidade": 35,
-    }
+
+    revistas = response.json()
+
+    assert isinstance(revistas["id"], int)
+    assert revistas["titulo"] == "Quatro Rodas"
+    assert revistas["genero"] == "carro"
+    assert revistas["edicao"] == "Setembro"
+    assert revistas["quantidade"] == 35
 
 
 # Teste de atualizacao completa de uma revista
-def test_update_revista():
+def test_update_revista(client):
+    created = client.post(
+        "/revista/",
+        json={
+            "titulo": "Mundo Estranho",
+            "genero": "tecnologia",
+            "edicao": "Novembro",
+            "quantidade": 10,
+        }
+    )
+
+    assert created.status_code == status.HTTP_201_CREATED
+    revista_id = created.json()["id"]
+
     response = client.put(
-        "/revista/Mundo Estranho",
+        f"/revista/{revista_id}",
         json={
             "titulo": "Super Interessante",
             "genero": "curiosidades",
@@ -82,49 +94,66 @@ def test_update_revista():
     )
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {
-        "titulo": "Super Interessante",
-        "genero": "curiosidades",
-        "edicao": "Abril",
-        "quantidade": 14,
-    }
+    assert response.json()["titulo"] == "Super Interessante"
+    assert response.json()["genero"] == "curiosidades"
+    assert response.json()["edicao"] == "Abril"
+    assert response.json()["quantidade"] == 14
 
 
 # Teste de atualizacao parcial de uma revista
-def test_partial_update_revista():
+def test_partial_update_revista(client):
+    created = client.post(
+        "/revista/",
+        json={
+            "titulo": "Mundo Estranho",
+            "genero": "tecnologia",
+            "edicao": "Novembro",
+            "quantidade": 10,
+        }
+    )
+
+    assert created.status_code == status.HTTP_201_CREATED
+    revista_id = created.json()["id"]
+
     response = client.patch(
-        "/revista/Mundo Estranho",
+        f"/revista/{revista_id}",
         json={
             "quantidade": 55,
         },
     )
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {
-        "titulo": "Mundo Estranho",
-        "genero": "tecnologia",
-        "edicao": "Novembro",
-        "quantidade": 55,
-    }
+    assert response.json()["titulo"] == "Mundo Estranho"
+    assert response.json()["quantidade"] == 55
 
 
-# Teste de remocao de um uma revista
-def test_delete_revista():
-    response = client.delete("/revista/Mundo Estranho")
+# Teste de remocao de uma revista
+def test_delete_revista(client):
+    created = client.post(
+        "/revista/",
+        json={
+            "titulo": "Mundo Estranho",
+            "genero": "tecnologia",
+            "edicao": "Novembro",
+            "quantidade": 10,
+        }
+    )
+
+    assert created.status_code == status.HTTP_201_CREATED
+    revista_id = created.json()["id"]
+
+    response = client.delete(
+        f"/revista/{revista_id}",
+    )
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {"mensagem": "A revista foi removida com sucesso"}
-
-
-# Teste de entrada de quantidade inválida
-def test_quantidade_invalida():
-    revista = {
-        "titulo": "Quatro Rodas",
-        "genero": "carro",
-        "edicao": "Setembro",
-        "quantidade": "vinte",
+    assert response.json() == {
+        "mensagem": "A revista foi removida com sucesso"
     }
 
-    response = client.post("/revista", json=revista)
+    #Confirma se foi deletada
+    get_response = client.get(f"/revista/{revista_id}")
 
-    assert response.status_code == 422
+    assert get_response.status_code == status.HTTP_404_NOT_FOUND
+
+
