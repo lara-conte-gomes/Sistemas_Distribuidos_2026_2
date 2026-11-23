@@ -4,38 +4,64 @@ import { LivroForm } from "./components/LivroForm";
 import { RevistaForm } from "./components/RevistaForm";
 import { FuncionarioForm } from "./components/FuncionarioForm";
 import { LivroEstante } from "./components/LivroEstante";
+import { RevistaEstante } from "./components/RevistaEstante";
+import { FuncionarioCard } from "./components/FuncionarioCard";
 
 export default function App() {
-  //Definição de qual aba será selecionada
+  // Definição de qual aba será selecionada
   const [tab, setTab] = useState("livros");
 
-  //Armazenando os registros cadastrados
+  // Armazenando os registros cadastrados
   const [livros, setLivros] = useState([]);
   const [revistas, setRevistas] = useState([]);
   const [funcionarios, setFuncionarios] = useState([]);
 
-  //Guardando o texto digitado na pesquisa
+  // Guardando o texto digitado na pesquisa
   const [search, setSearch] = useState("");
 
-  //Adicionando um livro à lista
+  // Registro que está sendo alterado
+  const [editando, setEditando] = useState(null);
+
+  // Adicionando ou alterando um livro
   function addLivro(livro) {
-    setLivros([...livros, { ...livro, id: crypto.randomUUID() }]);
+    if (editando) {
+      setLivros(livros.map((item) =>
+        item.id === editando.id ? { ...livro, id: item.id } : item
+      ));
+    } else {
+      setLivros([...livros, { ...livro, id: crypto.randomUUID() }]);
+    }
+    setEditando(null);
   }
 
-  //Adicionando uma revista à lista
+  // Adicionando ou alterando uma revista
   function addRevista(revista) {
-    setRevistas([...revistas, { ...revista, id: crypto.randomUUID() }]);
+    if (editando) {
+      setRevistas(revistas.map((item) =>
+        item.id === editando.id ? { ...revista, id: item.id } : item
+      ));
+    } else {
+      setRevistas([...revistas, { ...revista, id: crypto.randomUUID() }]);
+    }
+    setEditando(null);
   }
 
-  //Adicionando um funcionário à lista
+  // Adicionando ou alterando um funcionário
   function addFuncionario(funcionario) {
-    setFuncionarios([
-      ...funcionarios,
-      { ...funcionario, id: crypto.randomUUID() },
-    ]);
+    if (editando) {
+      setFuncionarios(funcionarios.map((item) =>
+        item.id === editando.id ? { ...funcionario, id: item.id } : item
+      ));
+    } else {
+      setFuncionarios([
+        ...funcionarios,
+        { ...funcionario, id: crypto.randomUUID() },
+      ]);
+    }
+    setEditando(null);
   }
 
-  //Selecionando os registros na aba atual da página
+  // Selecionando os registros da aba atual
   const lista =
     tab === "livros"
       ? livros
@@ -43,14 +69,21 @@ export default function App() {
         ? revistas
         : funcionarios;
 
-  //Filtrando os registros pelo título ou nome
-  const filtrados = lista.filter((item) =>
-    (item.titulo || item.nome)
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
+  // Filtrando os registros pelo título ou nome
+  const filtrados = lista.filter((item) => {
+    const nome = item.titulo || item.nome || "";
 
-  //Excluindo um registro da lista 
+    return nome
+      .toLowerCase()
+      .includes(search.trim().toLowerCase());
+  });
+
+  // Selecionando um registro para alteração
+  function editRecord(item) {
+    setEditando(item);
+  }
+
+  // Excluindo um registro da lista
   function deleteRecord(id) {
     if (!window.confirm("Deseja excluir este registro?")) return;
 
@@ -63,97 +96,131 @@ export default function App() {
         funcionarios.filter((funcionario) => funcionario.id !== id)
       );
     }
+
+    if (editando?.id === id) {
+      setEditando(null);
+    }
+  }
+
+  // Trocando de aba
+  function changeTab(novaTab) {
+    setTab(novaTab);
+    setEditando(null);
+    setSearch("");
   }
 
   return (
-    <main>
-      {/* Título da aplicação */}
-      <h1>BookStore</h1>
+    <main className="layout">
+      {/* Contadores na lateral esquerda */}
+      <aside className="contadores">
+        <h2>Resumo</h2>
 
-      {/* Mostrando a quantidade de registros */}
-      <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-lg bg-teal-50 p-5">
+        <div className="contador">
           <h3>Livros</h3>
-          <p className="text-3xl font-bold">{livros.length}</p>
+          <p>{livros.length}</p>
         </div>
 
-        <div className="rounded-lg bg-teal-50 p-5">
+        <div className="contador">
           <h3>Revistas</h3>
-          <p className="text-3xl font-bold">{revistas.length}</p>
+          <p>{revistas.length}</p>
         </div>
 
-        <div className="rounded-lg bg-teal-50 p-5">
+        <div className="contador">
           <h3>Funcionários</h3>
-          <p className="text-3xl font-bold">{funcionarios.length}</p>
+          <p>{funcionarios.length}</p>
         </div>
-      </div>
+      </aside>
 
-      {/* Botões para realizar a troca de aba */}
-      <nav>
-        <button type="button" onClick={() => setTab("livros")}>
-          Livros
-        </button>
+      {/* Conteúdo principal */}
+      <div className="conteudo">
+        <h1>Seja muito bem-vindo(a) à BookStore!</h1>
 
-        <button type="button" onClick={() => setTab("revistas")}>
-          Revistas
-        </button>
+        {/* Botões para trocar de aba */}
+        <nav>
+          <button type="button" onClick={() => changeTab("livros")}>
+            Livros
+          </button>
 
-        <button type="button" onClick={() => setTab("funcionarios")}>
-          Funcionários
-        </button>
-      </nav>
+          <button type="button" onClick={() => changeTab("revistas")}>
+            Revistas
+          </button>
 
-      {/* Exibindo o formulário da aba selecionada */}
-      {tab === "livros" && <LivroForm onAdd={addLivro} />}
+          <button type="button" onClick={() => changeTab("funcionarios")}>
+            Funcionários
+          </button>
+        </nav>
 
-      {tab === "revistas" && <RevistaForm onAdd={addRevista} />}
-
-      {tab === "funcionarios" && (
-        <FuncionarioForm onAdd={addFuncionario} />
-      )}
-
-      {/* Campo para pesquisar os registros */}
-      <h2>Lista de {tab}</h2>
-
-      <input
-        placeholder="Pesquisar..."
-        value={search}
-        onChange={(event) => setSearch(event.target.value)}
-      />
-
-      
-      {/* Exibindo os livros na estante */}
-      {tab === "livros" ? (
+        {/* Formulário da aba selecionada */}
         <section>
-          <h2>Minha estante</h2>
-          <LivroEstante 
-            livros={filtrados} 
-            onDelete={deleteRecord}
-          />
-        </section>
-      ) : (
-        // Listagem de revistas e funcionários
-        filtrados.map((item) => (
-          <div key={item.id}>
-            <p>
-              {Object.entries(item)
-                .filter(([campo]) => campo !== "id")
-                .map(([campo, valor]) => (
-                  <span key={campo}>
-                    {campo}: {valor}{" "}
-                  </span>
-                ))}
-            </p>
+          <h2>
+            {editando
+              ? `Alterar ${tab === "livros" ? "livro" : tab === "revistas" ? "revista" : "funcionário"}`
+              : `Cadastrar ${tab === "livros" ? "livro" : tab === "revistas" ? "revista" : "funcionário"}`}
+          </h2>
+          {tab === "livros" && (
+            <LivroForm
+              onAdd={addLivro}
+              editando={editando}
+              onCancel={() => setEditando(null)}
+            />
+          )}
 
-            <button
-              type="button"
-              onClick={() => deleteRecord(item.id)}
-            >
-              Excluir
-            </button>
-          </div>
-        ))
-      )}
+          {tab === "revistas" && (
+            <RevistaForm
+              onAdd={addRevista}
+              editando={editando}
+              onCancel={() => setEditando(null)}
+            />
+          )}
+
+          {tab === "funcionarios" && (
+            <FuncionarioForm
+              onAdd={addFuncionario}
+              editando={editando}
+              onCancel={() => setEditando(null)}
+            />
+          )}
+        </section>
+
+        {/* Pesquisa */}
+        <h2>Lista de {tab}</h2>
+
+        <input
+          placeholder="Pesquisar..."
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+        />
+
+        {/* Exibindo os registros cadastrados */}
+        {tab === "livros" ? (
+          <section>
+            <h2>Minha estante</h2>
+            <LivroEstante
+              livros={filtrados}
+              onDelete={deleteRecord}
+              onEdit={editRecord}
+            />
+          </section>
+        ) : tab === "revistas" ? (
+          <section>
+            <h2>Minhas revistas</h2>
+            <RevistaEstante
+              revistas={filtrados}
+              onDelete={deleteRecord}
+              onEdit={editRecord}
+            />
+          </section>
+        ) : (
+          <section>
+            <h2>Funcionários cadastrados</h2>
+            <FuncionarioCard
+              funcionarios={filtrados}
+              onDelete={deleteRecord}
+              onEdit={editRecord}
+            />
+          </section>
+        )}
+      </div>
     </main>
   );
 }

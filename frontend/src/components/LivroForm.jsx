@@ -1,13 +1,22 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { validateLivro } from "../livroValidation";
 
-export function LivroForm({ onAdd }) {
+export function LivroForm({ onAdd, editando, onCancel }) {
   const [titulo, setTitulo] = useState("");
   const [genero, setGenero] = useState("");
   const [publicoAlvo, setPublicoAlvo] = useState("");
   const [qtd, setQtd] = useState("");
   const [errors, setErrors] = useState({});
+
+  // Preenche os campos quando um livro é selecionado
+  useEffect(() => {
+    setTitulo(editando?.titulo ?? "");
+    setGenero(editando?.genero ?? "");
+    setPublicoAlvo(editando?.publicoAlvo ?? "");
+    setQtd(editando?.qtd ?? "");
+    setErrors({});
+  }, [editando]);
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -65,7 +74,16 @@ export function LivroForm({ onAdd }) {
       />
       {errors.qtd && <p role="alert">{errors.qtd}</p>}
 
-      <button type="submit">Cadastrar um livro</button>
+      <button type="submit">
+        {editando ? "Salvar alterações" : "Cadastrar um livro"}
+      </button>
+
+      {editando && (
+        <button type="button" onClick={onCancel}>
+          Cancelar
+        </button>
+      )}
+      
     </form>
   );
 }

@@ -1,5 +1,5 @@
 
-export function LivroEstante({ livros, onDelete }) {
+export function LivroEstante({ livros, onDelete, onEdit}) {
   const cores = [
     "#247E7A",
     "#C9593E",
@@ -26,6 +26,13 @@ export function LivroEstante({ livros, onDelete }) {
           >
             <span>{livro.titulo}</span>
           </div>
+
+          <button 
+            type="button" 
+            onClick={() => onEdit(livro)}
+          >
+            Alterar
+          </button>
 
           <button
             type="button"

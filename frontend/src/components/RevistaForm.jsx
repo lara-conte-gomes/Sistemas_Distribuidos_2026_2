@@ -1,13 +1,22 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { validateRevista } from "../revistaValidation";
 
-export function RevistaForm({ onAdd }) {
+export function RevistaForm({ onAdd, editando, onCancel }) {
   const [titulo, setTitulo] = useState("");
   const [genero, setGenero] = useState("");
   const [edicao, setEdicao] = useState("");
   const [quantidade, setQuantidade] = useState("");
   const [errors, setErrors] = useState({});
+
+  // Preenche os campos quando uma revista é selecionada
+  useEffect(() => {
+    setTitulo(editando?.titulo ?? "");
+    setGenero(editando?.genero ?? "");
+    setEdicao(editando?.edicao ?? "");
+    setQuantidade(editando?.quantidade ?? "");
+    setErrors({});
+  }, [editando]);
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -71,7 +80,16 @@ export function RevistaForm({ onAdd }) {
       />
       {errors.quantidade && <p role="alert">{errors.quantidade}</p>}
 
-      <button type="submit">Cadastrar uma revista</button>
+      <button type="submit">
+        {editando ? "Salvar alterações" : "Cadastrar uma revista"}
+      </button>
+
+      {editando && (
+        <button type="button" onClick={onCancel}>
+          Cancelar
+        </button>
+      )}
+      
     </form>
   );
 }

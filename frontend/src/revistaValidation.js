@@ -11,21 +11,21 @@ export function validateRevista({ titulo, genero, edicao, quantidade }) {
   const quantidadeConvertida = Number(quantidadeTexto);
 
   if (!tituloCerto) {
-    errors.titulo = "O título é obrigatório.";
+    errors.titulo = "O título é obrigatório nesse campo.";
   } else if (tituloCerto.length > REVISTA_TITULO_MAX_LENGTH) {
     errors.titulo = "O título deve ter no máximo 100 caracteres.";
   }
 
   if (!generoCerto) {
-    errors.genero = "O gênero é obrigatório.";
+    errors.genero = "O gênero é obrigatório nesse campo.";
   }
 
   if (!edicaoCerta) {
-    errors.edicao = "A edição é obrigatória.";
+    errors.edicao = "A edição é obrigatória nesse campo.";
   }
 
   if (!quantidadeTexto) {
-    errors.quantidade = "A quantidade é obrigatória.";
+    errors.quantidade = "A quantidade é obrigatória nesse campo.";
   } else if (
     !Number.isInteger(quantidadeConvertida) ||
     quantidadeConvertida < 0 ||

@@ -1,12 +1,20 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { validateFuncionario } from "../funcionarioValidation";
 
-export function FuncionarioForm({ onAdd }) {
+export function FuncionarioForm({ onAdd, editando, onCancel }) {
   const [nome, setNome] = useState("");
   const [idade, setIdade] = useState("");
   const [cargo, setCargo] = useState("");
   const [errors, setErrors] = useState({});
+
+  // Preenche os campos quando um funcionário é selecionado
+  useEffect(() => {
+    setNome(editando?.nome ?? "");
+    setIdade(editando?.idade ?? "");
+    setCargo(editando?.cargo ?? "");
+    setErrors({});
+  }, [editando]);
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -54,7 +62,15 @@ export function FuncionarioForm({ onAdd }) {
       />
       {errors.cargo && <p role="alert">{errors.cargo}</p>}
 
-      <button type="submit">Cadastrar um funcionário</button>
+      <button type="submit">
+        {editando ? "Salvar alterações" : "Cadastrar um funcionário"}
+      </button>
+
+      {editando && (
+        <button type="button" onClick={onCancel}>
+          Cancelar
+        </button>
+      )}
     </form>
   );
 }
