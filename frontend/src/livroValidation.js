@@ -20,7 +20,7 @@ export function validateLivro({ titulo, genero, publicoAlvo, qtd }) {
     errors.genero = "O gênero é obrigatório nesse campo.";
   }
 
-  if (!publicoLimpo) {
+  if (!publicoCerto) {
   errors.publicoAlvo = "O público-alvo é obrigatório nesse campo.";
   }
 
