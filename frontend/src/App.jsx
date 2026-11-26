@@ -1,5 +1,6 @@
 //imports
 import { useCallback, useEffect, useState } from "react";
+import logo from "/image/Logo_BookStore.jpg";
 import { FuncionarioCard } from "./components/FuncionarioCard";
 import { FuncionarioForm } from "./components/FuncionarioForm";
 import { LivroEstante } from "./components/LivroEstante";
@@ -150,16 +151,23 @@ export default function App() {
 		<main className="layout">
 			{/* Contadores na lateral esquerda */}
 			<aside className="contadores">
+				<img src={logo} alt="Logo BookStore" className="logo-bookstore" />
+
 				<h2>Resumo</h2>
 
 				<div className="contador">
 					<h3>Livros</h3>
-					<p>{livros.length}</p>
+					<p>{livros.reduce((total, livro) => total + Number(livro.qtd), 0)}</p>
 				</div>
 
 				<div className="contador">
 					<h3>Revistas</h3>
-					<p>{revistas.length}</p>
+					<p>
+						{revistas.reduce(
+							(total, revista) => total + Number(revista.quantidade),
+							0,
+						)}
+					</p>
 				</div>
 
 				<div className="contador">

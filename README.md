@@ -13,6 +13,7 @@ Esta aplicação tem como propósito auxiliar donos de livrarias e sebos no gere
 
 - Possui cadastro, consulta, atulização completa e parcial e remoção de livros, revistas e funcionários,
 - Busca de qualquer registro.
+- Resumo do estoque da loja com a quantidade total de exemplares de livros e revistas, além do número de funcionários que já foram cadastrados.
 - Validação dos dados que foram cadastrados.
 - Prevenção de títulos duplicados de livros e revistas.
 - Persistência dos dados no PostgreSQL.

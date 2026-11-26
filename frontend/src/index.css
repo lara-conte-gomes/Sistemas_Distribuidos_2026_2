@@ -275,3 +275,12 @@ p[role="alert"] {
 	color: white;
 	border-radius: 5px;
 }
+
+.logo-bookstore {
+	display: block;
+	width: 100%;
+	max-width: 150px;
+	height: auto;
+	margin: 0 auto 15px;
+	border-radius: 8px;
+}
