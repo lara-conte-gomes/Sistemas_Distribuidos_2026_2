@@ -4,7 +4,7 @@
     <img src="imagem/Logo_BookStore.jpg" alt="Logo BookStore" width="300">
 </p>
 
-Seja muito bem vindo ao site BookStore! Esta aplicação foi criada com o intuito de colocar em prática todos os conhecimentos adquiridos durante a disciplina de Laboratório de Sistemas Distribuídos, minitrado pelo monitor Matheus.
+Seja muito bem vindo ao site BookStore! Esta aplicação foi criada com o intuito de colocar em prática todos os conhecimentos adquiridos durante a disciplina de Laboratório de Sistemas Distribuídos, ministrada pelo monitor Matheus.
 
 ## Objetivos
 Esta aplicação tem como propósito auxiliar donos de livrarias e sebos no gerenciamento de **livros**, **revistas** e **funcionários**, disponibilizando as operações completas de CRUD em todos os três.
