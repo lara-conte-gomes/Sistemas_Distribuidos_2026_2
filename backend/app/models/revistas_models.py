@@ -17,6 +17,7 @@ class Revista(Base):
     titulo: Mapped[str] = mapped_column(
         String(150),
         nullable=False,
+        unique=True,
     )
 
     genero: Mapped[str] = mapped_column(

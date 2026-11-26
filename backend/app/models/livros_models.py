@@ -17,6 +17,7 @@ class Livro(Base):
     titulo: Mapped[str] = mapped_column(
         String(100),
         nullable=False,
+        unique=True,
     )
 
     genero: Mapped[str] = mapped_column(

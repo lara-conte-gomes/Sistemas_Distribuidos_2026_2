@@ -73,11 +73,18 @@ def test_adicionar_livros():
         "quantidade": 30,
     }
 
-    with patch.object(
-        livros_service.livro_rst,
-        "adicionar_livro",
-        return_value=expected_livros,
-    ) as mock_repository:
+    with (
+        patch.object(
+            livros_service.livro_rst,
+            "get_livro_by_titulo",
+            return_value=None,
+        ),
+        patch.object(
+            livros_service.livro_rst,
+            "adicionar_livro",
+            return_value=expected_livros,
+        ) as mock_repository,
+    ):
         result = livros_service.adicionar_livro(db, livro)
 
     assert result == expected_livros
@@ -109,11 +116,23 @@ def test_update_livro():
         "quantidade": 50,
     }
 
-    with patch.object(
-        livros_service.livro_rst,
-        "update_livro",
-        return_value=expected_livro,
-    ) as mock_repository:
+    with (
+        patch.object(
+            livros_service.livro_rst,
+            "get_livro",
+            return_value=expected_livro,
+        ),
+        patch.object(
+            livros_service.livro_rst,
+            "get_livro_by_titulo",
+            return_value=None,
+        ),
+        patch.object(
+            livros_service.livro_rst,
+            "update_livro",
+            return_value=expected_livro,
+        ) as mock_repository,
+    ):
         result = livros_service.update_livro(db, 1, livro)
 
     assert result == expected_livro
@@ -143,11 +162,18 @@ def test_partial_update_livro():
         "quantidade": 10,
     }
 
-    with patch.object(
-        livros_service.livro_rst,
-        "update_livro",
-        return_value=expected_livros,
-    ) as mock_repository:
+    with (
+        patch.object(
+            livros_service.livro_rst,
+            "get_livro",
+            return_value=expected_livros,
+        ),
+        patch.object(
+            livros_service.livro_rst,
+            "update_livro",
+            return_value=expected_livros,
+        ) as mock_repository,
+    ):
         result = livros_service.partial_update_livro(db, 1, livro)
 
     assert result == expected_livros

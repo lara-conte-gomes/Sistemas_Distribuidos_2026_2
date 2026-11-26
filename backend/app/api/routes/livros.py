@@ -36,13 +36,27 @@ def get_livro(livro_id: int, db: DbSession):
 # Rota para a adição de um livro novo
 @router.post("/", status_code=status.HTTP_201_CREATED)
 def adicionar_livro(livro: CriarLivro, db: DbSession):
-    return livros_service.adicionar_livro(db, livro)
+    try:
+        return livros_service.adicionar_livro(db, livro)
+
+    except livros_service.LivroDuplicadoError as erro:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(erro),
+        ) from erro
 
 
 # Rota para atualizar um livro
 @router.put("/{livro_id}")
 def update_livro(livro_id: int, livro: LivroUpdate, db: DbSession):
-    updated_livro = livros_service.update_livro(db, livro_id, livro)
+    try:
+        updated_livro = livros_service.update_livro(db, livro_id, livro)
+
+    except livros_service.LivroDuplicadoError as erro:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(erro),
+        ) from erro
 
     # Exceção para caso o livro não exista na lista
     if updated_livro is None:
@@ -57,7 +71,14 @@ def update_livro(livro_id: int, livro: LivroUpdate, db: DbSession):
 # Rota para atualização parcial dos dados de um livro
 @router.patch("/{livro_id}")
 def partial_update_livro(livro_id: int, livro: LivroPatch, db: DbSession):
-    parcial_updated_livro = livros_service.partial_update_livro(db, livro_id, livro)
+    try:
+        parcial_updated_livro = livros_service.partial_update_livro(db, livro_id, livro)
+
+    except livros_service.LivroDuplicadoError as erro:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(erro),
+        ) from erro
 
     # Exceção para caso o livro não exista na lista
     if parcial_updated_livro is None:

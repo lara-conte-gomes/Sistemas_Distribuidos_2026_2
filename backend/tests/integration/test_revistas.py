@@ -153,3 +153,29 @@ def test_delete_revista(client):
     get_response = client.get(f"/revista/{revista_id}")
 
     assert get_response.status_code == status.HTTP_404_NOT_FOUND
+
+
+# Teste de criacao de uma revista com titulo duplicado
+def test_adicionar_revista_duplicada(client):
+    revista = {
+        "titulo": "Mundo Estranho",
+        "genero": "tecnologia",
+        "edicao": "Novembro",
+        "quantidade": 10,
+    }
+
+    created = client.post("/revista/", json=revista)
+
+    assert created.status_code == status.HTTP_201_CREATED
+
+    revista["edicao"] = "Dezembro"
+
+    response = client.post("/revista/", json=revista)
+
+    assert response.status_code == status.HTTP_409_CONFLICT
+    assert response.json()["detail"] == "Já existe uma revista com esse título"
+
+    # Confirma que apenas uma revista foi cadastrada
+    revistas = client.get("/revista/").json()
+
+    assert len(revistas) == 1

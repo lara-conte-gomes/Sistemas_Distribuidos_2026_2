@@ -1,4 +1,5 @@
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.models.livros_models import Livro
@@ -15,6 +16,12 @@ def get_livro(db: Session, livro_id: int):
     return db.get(Livro, livro_id)
 
 
+# Buscar um livro pelo titulo
+def get_livro_by_titulo(db: Session, titulo: str):
+    statement = select(Livro).where(Livro.titulo == titulo)
+    return db.scalars(statement).first()
+
+
 # Adicionar um livro
 def adicionar_livro(
     db: Session, titulo: str, genero: str, publico_alvo: str, quantidade: int
@@ -24,7 +31,13 @@ def adicionar_livro(
     )
 
     db.add(novo_livro)
-    db.commit()
+
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise
+
     db.refresh(novo_livro)
 
     return novo_livro
@@ -40,7 +53,12 @@ def update_livro(db: Session, livro_id, data: dict):
     for field, value in data.items():
         setattr(livro, field, value)
 
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise
+
     db.refresh(livro)
 
     return livro

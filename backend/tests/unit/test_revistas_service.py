@@ -73,11 +73,18 @@ def test_adicionar_revistas():
         "quantidade": 35,
     }
 
-    with patch.object(
-        revistas_service.revistas_rst,
-        "adicionar_revista",
-        return_value=expected_revistas,
-    ) as mock_repository:
+    with (
+        patch.object(
+            revistas_service.revistas_rst,
+            "get_revista_by_titulo",
+            return_value=None,
+        ),
+        patch.object(
+            revistas_service.revistas_rst,
+            "adicionar_revista",
+            return_value=expected_revistas,
+        ) as mock_repository,
+    ):
         result = revistas_service.adicionar_revista(db, revista)
 
     assert result == expected_revistas
@@ -109,11 +116,23 @@ def test_update_revista():
         "quantidade": 14,
     }
 
-    with patch.object(
-        revistas_service.revistas_rst,
-        "update_revista",
-        return_value=expected_revista,
-    ) as mock_repository:
+    with (
+        patch.object(
+            revistas_service.revistas_rst,
+            "get_revista",
+            return_value=expected_revista,
+        ),
+        patch.object(
+            revistas_service.revistas_rst,
+            "get_revista_by_titulo",
+            return_value=None,
+        ),
+        patch.object(
+            revistas_service.revistas_rst,
+            "update_revista",
+            return_value=expected_revista,
+        ) as mock_repository,
+    ):
         result = revistas_service.update_revista(db, 1, revista)
 
     assert result == expected_revista
@@ -129,7 +148,7 @@ def test_update_revista():
     )
 
 
-# Teste de atualizacao parcial de um livro
+# Teste de atualizacao parcial de uma revista
 def test_partial_update_revista():
     db = MagicMock()
 
@@ -145,11 +164,18 @@ def test_partial_update_revista():
         "quantidade": 55,
     }
 
-    with patch.object(
-        revistas_service.revistas_rst,
-        "update_revista",
-        return_value=expected_revistas,
-    ) as mock_repository:
+    with (
+        patch.object(
+            revistas_service.revistas_rst,
+            "get_revista",
+            return_value=expected_revistas,
+        ),
+        patch.object(
+            revistas_service.revistas_rst,
+            "update_revista",
+            return_value=expected_revistas,
+        ) as mock_repository,
+    ):
         result = revistas_service.partial_update_revista(db, 1, revista)
 
     assert result == expected_revistas

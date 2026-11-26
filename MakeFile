@@ -4,9 +4,10 @@
 .PHONY: up build rebuild logs api-logs down status_container shell_api
 .PHONY: db-upgrade db-downgrade db-current db-history
 .PHONY: db-tables db-shell db-revision setup-db
-.PHONY: frontend-install frontend-dev frontend-lint frontend-format
+.PHONY: frontend-install frontend-dev frontend-lint frontend-formatacao
 .PHONY: frontend-check frontend-test frontend-test-e2e frontend-build
 .PHONY: ci-frontend check-all up-build e2e
+.PHONY: test ps
 
 #Criação de variáveis
 BACKEND := backend
@@ -111,7 +112,7 @@ build:
 	$(DOCKER) build
 
 rebuild:
-	$(DOCKER) up --build -d
+	$(DOCKER) up --build -d --wait
 
 logs:
 	$(DOCKER) logs -f
@@ -120,7 +121,7 @@ api-logs:
 	$(DOCKER) logs -f api
 
 down:
-	$(DCOKER) down
+	$(DOCKER) down
 
 status_container:
 	$(DOCKER) ps
@@ -194,3 +195,7 @@ check-all: ci-backend ci-frontend
 up-build: rebuild
 
 e2e: frontend-test-e2e
+
+test: teste
+
+ps: status_container

@@ -5,7 +5,11 @@ export async function request(url, options, errorMessage) {
 	const response = await fetch(url, options);
 
 	if (!response.ok) {
-		throw new Error(errorMessage);
+		const error = await response.json().catch(() => null);
+
+		throw new Error(
+			typeof error?.detail === "string" ? error.detail : errorMessage,
+		);
 	}
 
 	if (response.status === 204) {

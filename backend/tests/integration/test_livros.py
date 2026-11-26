@@ -153,3 +153,27 @@ def test_delete_livro(client):
     get_response = client.get(f"/livro/{livro_id}")
 
     assert get_response.status_code == status.HTTP_404_NOT_FOUND
+
+
+# Teste de criacao de um livro com titulo duplicado
+def test_adicionar_livro_duplicado(client):
+    livro = {
+        "titulo": "A Bússola de Ouro",
+        "genero": "aventura",
+        "publico_alvo": "jovens",
+        "quantidade": 10,
+    }
+
+    created = client.post("/livro/", json=livro)
+
+    assert created.status_code == status.HTTP_201_CREATED
+
+    response = client.post("/livro/", json=livro)
+
+    assert response.status_code == status.HTTP_409_CONFLICT
+    assert response.json()["detail"] == "Já existe um livro com esse título"
+
+    # Confirma que apenas um livro foi cadastrado
+    livros = client.get("/livro/").json()
+
+    assert len(livros) == 1

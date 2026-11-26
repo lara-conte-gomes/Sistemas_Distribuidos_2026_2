@@ -1,4 +1,5 @@
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.models.revistas_models import Revista
@@ -15,6 +16,12 @@ def get_revista(db: Session, revista_id: int):
     return db.get(Revista, revista_id)
 
 
+# Buscar uma revista pelo titulo
+def get_revista_by_titulo(db: Session, titulo: str):
+    statement = select(Revista).where(Revista.titulo == titulo)
+    return db.scalars(statement).first()
+
+
 # Adicionar uma revista
 def adicionar_revista(
     db: Session, titulo: str, genero: str, edicao: str, quantidade: int
@@ -24,7 +31,13 @@ def adicionar_revista(
     )
 
     db.add(nova_revista)
-    db.commit()
+
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise
+
     db.refresh(nova_revista)
 
     return nova_revista
@@ -40,7 +53,12 @@ def update_revista(db: Session, revista_id, data: dict):
     for field, value in data.items():
         setattr(revista, field, value)
 
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise
+
     db.refresh(revista)
 
     return revista

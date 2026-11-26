@@ -36,13 +36,27 @@ def get_revista(revista_id: int, db: DbSession):
 # Rota para a adição de uma revista nova
 @router.post("/", status_code=status.HTTP_201_CREATED)
 def adicionar_revista(revista: CriarRevista, db: DbSession):
-    return revistas_service.adicionar_revista(db, revista)
+    try:
+        return revistas_service.adicionar_revista(db, revista)
+
+    except revistas_service.RevistaDuplicadaError as erro:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(erro),
+        ) from erro
 
 
 # Rota para atualizar uma revista
 @router.put("/{revista_id}")
 def update_revista(revista_id: int, revista: RevistaUpdate, db: DbSession):
-    updated_revista = revistas_service.update_revista(db, revista_id, revista)
+    try:
+        updated_revista = revistas_service.update_revista(db, revista_id, revista)
+
+    except revistas_service.RevistaDuplicadaError as erro:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(erro),
+        ) from erro
 
     # Exceção para caso a revista não exista na lista
     if updated_revista is None:
@@ -54,12 +68,19 @@ def update_revista(revista_id: int, revista: RevistaUpdate, db: DbSession):
     return updated_revista
 
 
-# Rota para atualização parcial dos dados de um revista
+# Rota para atualização parcial dos dados de uma revista
 @router.patch("/{revista_id}")
 def partial_update_revista(revista_id: int, revista: RevistaPatch, db: DbSession):
-    parcial_updated_revista = revistas_service.partial_update_revista(
-        db, revista_id, revista
-    )
+    try:
+        parcial_updated_revista = revistas_service.partial_update_revista(
+            db, revista_id, revista
+        )
+
+    except revistas_service.RevistaDuplicadaError as erro:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(erro),
+        ) from erro
 
     # Exceção para caso a revista não exista na lista
     if parcial_updated_revista is None:
