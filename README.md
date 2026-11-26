@@ -61,56 +61,53 @@ A aplicação criada é composta por três serviços:
 
 A comunicação entre o frontend e o backend ocorre por meio de requisições HTTP, com CORS configurado para a comunicação entre os serviços.
 
-## Estrutura do projeto
+## Estrutura do Projeto
+
 ```text
 Sistemas_Distribuidos_2026_2/
-│
 ├── .github/
-│   └── workflows/
-│       ├── ci_backend.yml
-│       └── ci_frontend.yml
-│
+│   └── workflows/          # Pipelines de integração contínua
 ├── backend/
-│   ├── alembic/
-│   │   └── versions/
+│   ├── alembic/            # Migrações do banco de dados
 │   ├── app/
-│   │   ├── api/
-│   │   │   └── routes/
-│   │   ├── core/
-│   │   ├── database/
-│   │   ├── models/
-│   │   ├── repositories/
-│   │   ├── schemas/
-│   │   ├── services/
-│   │   └── main.py
-│   ├── tests/
-│   │   ├── integration/
-│   │   └── unit/
+│   │   ├── api/            # Rotas da API
+│   │   ├── database/       # Configuração do banco de dados
+│   │   ├── models/         # Modelos SQLAlchemy
+│   │   ├── repositories/   # Operações no banco de dados
+│   │   ├── schemas/        # Validação dos dados
+│   │   ├── services/       # Regras de negócio
+│   │   └── main.py         # Inicialização da API
+│   ├── tests/              # Testes do backend
 │   ├── alembic.ini
 │   ├── Dockerfile
 │   ├── poetry.lock
 │   └── pyproject.toml
-│
 ├── frontend/
+│   ├── image/              # Imagens utilizadas na interface
 │   ├── src/
-│   │   ├── components/
-│   │   ├── services/
-│   │   └── App.jsx
+│   │   ├── components/     # Componentes React
+│   │   ├── services/       # Comunicação com a API
+│   │   └── App.jsx         # Componente principal
 │   ├── tests/
-│   │   ├── unit/
-│   │   ├── integration/
-│   │   └── e2e/
+│   │   ├── unit/           # Testes unitários
+│   │   ├── integration/    # Testes de integração
+│   │   └── e2e/            # Testes de ponta a ponta
+│   ├── .dockerignore
+│   ├── .gitignore
+│   ├── biome.json
 │   ├── Dockerfile
-│   ├── package.json
+│   ├── index.html
 │   ├── package-lock.json
-│   └── playwright.config.js
-│
-├── .env.example
+│   ├── package.json
+│   ├── playwright.config.js
+│   └── vite.config.js
+├── imagem/                 # Imagem da Logo para o README
+├── .env.example            # Modelo das variáveis de ambiente
 ├── .gitignore
-├── compose.yaml
+├── compose.yaml             # Orquestração dos containers
 ├── LICENSE
-├── Makefile
-└── README.md
+├── Makefile                 # Automação de comandos
+└── README.md                # Documentação do projeto
 ```
 
 ## Pré-requistos do projeto
