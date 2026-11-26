@@ -56,7 +56,7 @@ jobs:
 
       # Execucao dos testes unitarios e de integracao
       - name: Run Vitest tests
-        run: npm vitest run
+        run: npm run test
 
       # Verificacao da compilacao do frontend
       - name: Build frontend
