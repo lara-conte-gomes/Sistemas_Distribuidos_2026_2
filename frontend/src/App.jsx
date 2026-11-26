@@ -1,11 +1,14 @@
 //imports
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LivroForm } from "./components/LivroForm";
 import { RevistaForm } from "./components/RevistaForm";
 import { FuncionarioForm } from "./components/FuncionarioForm";
 import { LivroEstante } from "./components/LivroEstante";
 import { RevistaEstante } from "./components/RevistaEstante";
 import { FuncionarioCard } from "./components/FuncionarioCard";
+import { listLivros, createLivro, updateLivro, deleteLivro } from "./services/livrosService";
+import { listRevistas, createRevista, updateRevista, deleteRevista } from "./services/revistasService";
+import { listFuncionarios, createFuncionario, updateFuncionario, deleteFuncionario } from "./services/funcionariosService";
 
 export default function App() {
   // Definição de qual aba será selecionada
@@ -22,42 +25,62 @@ export default function App() {
   // Registro que está sendo alterado
   const [editando, setEditando] = useState(null);
 
+  // Carregando os registros da API
+  async function carregarLivros() {
+    const dados = await listLivros();
+    setLivros(dados);
+  }
+
+  async function carregarRevistas() {
+    const dados = await listRevistas();
+    setRevistas(dados);
+  }
+
+  async function carregarFuncionarios() {
+    const dados = await listFuncionarios();
+    setFuncionarios(dados);
+  }
+
+  // Buscando os registros ao carregar a página
+  useEffect(() => {
+    carregarLivros().catch(console.error);
+    carregarRevistas().catch(console.error);
+    carregarFuncionarios().catch(console.error);
+  }, []);
+
   // Adicionando ou alterando um livro
-  function addLivro(livro) {
+  async function addLivro(livro) {
     if (editando) {
-      setLivros(livros.map((item) =>
-        item.id === editando.id ? { ...livro, id: item.id } : item
-      ));
+      await updateLivro(editando.id, livro);
     } else {
-      setLivros([...livros, { ...livro, id: crypto.randomUUID() }]);
+      await createLivro(livro);
     }
+
+    await carregarLivros();
     setEditando(null);
   }
 
   // Adicionando ou alterando uma revista
-  function addRevista(revista) {
+  async function addRevista(revista) {
     if (editando) {
-      setRevistas(revistas.map((item) =>
-        item.id === editando.id ? { ...revista, id: item.id } : item
-      ));
+      await updateRevista(editando.id, revista);
     } else {
-      setRevistas([...revistas, { ...revista, id: crypto.randomUUID() }]);
+      await createRevista(revista);
     }
+
+    await carregarRevistas();
     setEditando(null);
   }
 
   // Adicionando ou alterando um funcionário
-  function addFuncionario(funcionario) {
+  async function addFuncionario(funcionario) {
     if (editando) {
-      setFuncionarios(funcionarios.map((item) =>
-        item.id === editando.id ? { ...funcionario, id: item.id } : item
-      ));
+      await updateFuncionario(editando.id, funcionario);
     } else {
-      setFuncionarios([
-        ...funcionarios,
-        { ...funcionario, id: crypto.randomUUID() },
-      ]);
+      await createFuncionario(funcionario);
     }
+
+    await carregarFuncionarios();
     setEditando(null);
   }
 
@@ -84,21 +107,26 @@ export default function App() {
   }
 
   // Excluindo um registro da lista
-  function deleteRecord(id) {
+  async function deleteRecord(id) {
     if (!window.confirm("Deseja excluir este registro?")) return;
 
-    if (tab === "livros") {
-      setLivros(livros.filter((livro) => livro.id !== id));
-    } else if (tab === "revistas") {
-      setRevistas(revistas.filter((revista) => revista.id !== id));
-    } else {
-      setFuncionarios(
-        funcionarios.filter((funcionario) => funcionario.id !== id)
-      );
-    }
+    try {
+      if (tab === "livros") {
+        await deleteLivro(id);
+        await carregarLivros();
+      } else if (tab === "revistas") {
+        await deleteRevista(id);
+        await carregarRevistas();
+      } else {
+        await deleteFuncionario(id);
+        await carregarFuncionarios();
+      }
 
-    if (editando?.id === id) {
-      setEditando(null);
+      if (editando?.id === id) {
+        setEditando(null);
+      }
+    } catch (error) {
+      alert(error.message);
     }
   }
 
@@ -157,6 +185,7 @@ export default function App() {
               ? `Alterar ${tab === "livros" ? "livro" : tab === "revistas" ? "revista" : "funcionário"}`
               : `Cadastrar ${tab === "livros" ? "livro" : tab === "revistas" ? "revista" : "funcionário"}`}
           </h2>
+
           {tab === "livros" && (
             <LivroForm
               onAdd={addLivro}

@@ -6,7 +6,8 @@ requires-python = ">=3.10,<4.0"
 dependencies = [
     "fastapi",
     "uvicorn",
-    "alembic (>=1.20.1,<2.0.0)"
+    "alembic (>=1.20.1,<2.0.0)",
+    "psycopg[binary] (>=3.3.9,<4.0.0)"
 ]
 
 [tool.poetry]

@@ -34,6 +34,7 @@ export function FuncionarioCard({ funcionarios, onEdit, onDelete }) {
                 type="button" 
                 onClick={() => onEdit(funcionario)}
                 style={{ marginBottom: "20px" }}
+                aria-label={`Editar funcionário ${funcionario.nome}`}
             >
               Alterar
             </button>
@@ -41,6 +42,7 @@ export function FuncionarioCard({ funcionarios, onEdit, onDelete }) {
             <button 
                 type="button" 
                 onClick={() => onDelete(funcionario.id)}
+                aria-label={`Excluir funcionário ${funcionario.nome}`}
             >
               Excluir
             </button>

@@ -30,6 +30,7 @@ export function LivroEstante({ livros, onDelete, onEdit}) {
           <button 
             type="button" 
             onClick={() => onEdit(livro)}
+            aria-label={`Editar livro ${livro.titulo}`}
           >
             Alterar
           </button>
@@ -37,6 +38,7 @@ export function LivroEstante({ livros, onDelete, onEdit}) {
           <button
             type="button"
             onClick={() => onDelete(livro.id)}
+            aria-label={`Excluir livro ${livro.titulo}`}
           >
             Excluir
           </button>

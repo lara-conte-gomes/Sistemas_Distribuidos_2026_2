@@ -16,7 +16,7 @@ export function FuncionarioForm({ onAdd, editando, onCancel }) {
     setErrors({});
   }, [editando]);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
     const result = validateFuncionario({ nome, idade, cargo });
@@ -24,12 +24,16 @@ export function FuncionarioForm({ onAdd, editando, onCancel }) {
 
     if (Object.keys(result.errors).length > 0) return;
 
-    onAdd(result.values);
+    try {
+      await onAdd(result.values);
 
-    setNome("");
-    setIdade("");
-    setCargo("");
-    setErrors({});
+      setNome("");
+      setIdade("");
+      setCargo("");
+      setErrors({});
+    } catch (error) {
+      alert(error.message);
+    }
   }
 
   return (

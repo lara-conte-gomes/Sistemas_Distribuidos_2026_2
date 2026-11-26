@@ -18,27 +18,25 @@ export function RevistaForm({ onAdd, editando, onCancel }) {
     setErrors({});
   }, [editando]);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
-    const result = validateRevista({
-      titulo,
-      genero,
-      edicao,
-      quantidade,
-    });
-
+    const result = validateRevista({ titulo, genero, edicao, quantidade });
     setErrors(result.errors);
 
     if (Object.keys(result.errors).length > 0) return;
 
-    onAdd(result.values);
+    try {
+      await onAdd(result.values);
 
-    setTitulo("");
-    setGenero("");
-    setEdicao("");
-    setQuantidade("");
-    setErrors({});
+      setTitulo("");
+      setGenero("");
+      setEdicao("");
+      setQuantidade("");
+      setErrors({});
+    } catch (error) {
+      alert(error.message);
+    }
   }
 
   return (

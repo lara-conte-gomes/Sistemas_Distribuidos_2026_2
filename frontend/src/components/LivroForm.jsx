@@ -18,7 +18,7 @@ export function LivroForm({ onAdd, editando, onCancel }) {
     setErrors({});
   }, [editando]);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
     const result = validateLivro({ titulo, genero, publicoAlvo, qtd });
@@ -26,13 +26,17 @@ export function LivroForm({ onAdd, editando, onCancel }) {
 
     if (Object.keys(result.errors).length > 0) return;
 
-    onAdd(result.values);
+    try {
+      await onAdd(result.values);
 
-    setTitulo("");
-    setGenero("");
-    setPublicoAlvo("");
-    setQtd("");
-    setErrors({});
+      setTitulo("");
+      setGenero("");
+      setPublicoAlvo("");
+      setQtd("");
+      setErrors({});
+    } catch (error) {
+      alert(error.message);
+    }
   }
 
   return (

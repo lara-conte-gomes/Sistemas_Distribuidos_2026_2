@@ -31,6 +31,7 @@ export function RevistaEstante({ revistas, onDelete, onEdit }) {
           <button 
             type="button" 
             onClick={() => onEdit(revista)}
+            aria-label={`Editar revista ${revista.titulo}`}
           >
             Alterar
           </button>
@@ -38,6 +39,7 @@ export function RevistaEstante({ revistas, onDelete, onEdit }) {
           <button
             type="button"
             onClick={() => onDelete(revista.id)}
+            aria-label={`Excluir revista ${revista.titulo}`}
           >
             Excluir
           </button>
