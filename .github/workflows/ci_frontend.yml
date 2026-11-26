@@ -5,19 +5,17 @@ on:
     paths:
       - "frontend/**"
       - "backend/**"
-      - "docker-compose.yml"
+      - "compose.yaml"
       - ".env.example"
-      - ".github/workflows/ci-frontend.yml"
+      - ".github/workflows/ci_frontend.yml"
 
   push:
-    branches:
-      - main
     paths:
       - "frontend/**"
       - "backend/**"
-      - "docker-compose.yml"
+      - "compose.yaml"
       - ".env.example"
-      - ".github/workflows/ci-frontend.yml"
+      - ".github/workflows/ci_frontend.yml"
 
 jobs:
   frontend:
