@@ -1,20 +1,18 @@
-
-export const API_URL =
-  import.meta.env.VITE_API_URL ?? "http://localhost:8000";
+export const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
 //Requisições HTTP
 export async function request(url, options, errorMessage) {
-  const response = await fetch(url, options);
+	const response = await fetch(url, options);
 
-  if (!response.ok) {
-    throw new Error(errorMessage);
-  }
+	if (!response.ok) {
+		throw new Error(errorMessage);
+	}
 
-  if (response.status === 204) {
-    return null;
-  }
+	if (response.status === 204) {
+		return null;
+	}
 
-  const text = await response.text();
+	const text = await response.text();
 
-  return text ? JSON.parse(text) : null;
+	return text ? JSON.parse(text) : null;
 }

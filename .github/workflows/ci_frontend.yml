@@ -1,0 +1,95 @@
+name: CI - Frontend BookStore
+
+on:
+  pull_request:
+    paths:
+      - "frontend/**"
+      - "backend/**"
+      - "docker-compose.yml"
+      - ".env.example"
+      - ".github/workflows/ci-frontend.yml"
+
+  push:
+    branches:
+      - main
+    paths:
+      - "frontend/**"
+      - "backend/**"
+      - "docker-compose.yml"
+      - ".env.example"
+      - ".github/workflows/ci-frontend.yml"
+
+jobs:
+  frontend:
+    name: Biome, Vitest, Build e Playwright
+    runs-on: ubuntu-latest
+
+    env:
+      POSTGRES_DB: app_test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/app_test
+      VITE_API_URL: http://127.0.0.1:8000
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      # Verificacao da qualidade do codigo
+      - name: Run Biome lint
+        run: npm run lint
+
+      - name: Check formatting
+        run: npm run format:check
+
+      # Execucao dos testes unitarios e de integracao
+      - name: Run Vitest tests
+        run: npx vitest run
+
+      # Verificacao da compilacao do frontend
+      - name: Build frontend
+        run: npm run build
+
+      # Inicializacao do backend e do banco de dados
+      - name: Start PostgreSQL and FastAPI
+        working-directory: .
+        run: docker compose up -d --build --wait db api
+
+      # Aplicacao das migracoes
+      - name: Run Alembic migrations
+        working-directory: .
+        run: docker compose exec -T api alembic upgrade head
+
+      # Instalacao do navegador
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      # Execucao dos testes E2E
+      - name: Run Playwright E2E tests
+        run: npm run test:e2e
+
+      # Exibecao dos logs em caso de falha
+      - name: Show Docker logs on failure
+        if: failure()
+        working-directory: .
+        run: docker compose logs --no-color api db
+
+      # Encerramento do ambiente de testes
+      - name: Stop Docker containers
+        if: always()
+        working-directory: .
+        run: docker compose down -v

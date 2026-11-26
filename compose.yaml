@@ -9,7 +9,7 @@ services:
       - "8000:8000"
 
     environment:
-      DATABASE_URL: postgresql+psycopg://app:app@db:5432/app
+      DATABASE_URL: ${DATABASE_URL}
     depends_on:
       db:
         condition: service_healthy
@@ -21,18 +21,17 @@ services:
       retries: 5
       start_period: 10s
 
-  
   db:
     image: postgres:16
     container_name: bookstore_db
     environment:
-      POSTGRES_DB: app
-      POSTGRES_USER: app
-      POSTGRES_PASSWORD: app
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -43,6 +42,8 @@ services:
       context: ./frontend
     ports:
       - "5173:5173"
+    environment:
+      VITE_API_URL: ${VITE_API_URL}
     depends_on:
       api:
         condition: service_healthy
