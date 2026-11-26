@@ -19,6 +19,9 @@ RUN pip install --no-cache-dir poetry \
 #Copiar a pasta do diretório para a imagem Docker
 COPY app ./app
 
+COPY alembic.ini ./
+COPY alembic ./alembic
+
 #Exposição da porta
 EXPOSE 8000
 

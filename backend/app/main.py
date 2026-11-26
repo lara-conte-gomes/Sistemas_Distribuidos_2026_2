@@ -8,13 +8,9 @@ from app.api.routes.checar_api import router as check_router
 from app.api.routes.funcionarios import router as funcionarios_router
 from app.api.routes.livros import router as livros_router
 from app.api.routes.revistas import router as revistas_router
-from app.database.init_db import create_tables
 
 # Criação da instância da aplicação do FastAPI
 app = FastAPI()
-
-# Criação das tabelas
-create_tables()
 
 # Comunicacao entre API e Frontend
 cors_origins = os.getenv(
