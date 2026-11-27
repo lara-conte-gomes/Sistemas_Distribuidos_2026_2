@@ -285,7 +285,7 @@ Os workflows estão disponíveis nos caminhos abaixo (o primeiro é referente ao
 
 O vídeo apresenta toda a arquitetura criada, a execução da aplicação, suas funcionalidades, a persistência dos dados e os testes automatizados.
 
-**Link do vídeo**
+**[Link do vídeo](https://youtu.be/qFoEwihZrps)**
 
 ## Informações adicionais
 
