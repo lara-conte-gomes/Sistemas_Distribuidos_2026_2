@@ -1,0 +1,201 @@
+#Tarefas
+.PHONY: help install run teste teste-verbose lint lint-fix
+.PHONY: formatacao-check formatacao frontend-lint-fix frontend-check-fix cache ci-backend
+.PHONY: up build rebuild logs api-logs down status_container shell_api
+.PHONY: db-upgrade db-downgrade db-current db-history
+.PHONY: db-tables db-shell db-revision setup-db
+.PHONY: frontend-install frontend-dev frontend-lint frontend-formatacao
+.PHONY: frontend-check frontend-test frontend-test-e2e frontend-build
+.PHONY: ci-frontend check-all up-build e2e
+.PHONY: test ps
+
+#Criação de variáveis
+BACKEND := backend
+FRONTEND := frontend
+POETRY := poetry run
+PYTEST := $(POETRY) python -m pytest
+UVICORN := $(POETRY) uvicorn
+RUFF := $(POETRY) ruff
+DOCKER := docker compose
+
+#Lista de comandos
+help:
+	@echo "Lista de comandos do MakeFile"
+	@echo ""
+	@echo "Comandos do backend"
+	@echo "make install - instalacao das dependencias"
+	@echo "make run - inicializacao do servidor"
+	@echo "make teste - execucao dos testes com pytest"
+	@echo "make teste-verbose - execucao dos testes com logs"
+	@echo "make lint - verificacao de erros e boas praticas de codigo"
+	@echo "make lint-fix - correcao de problemas com lint"
+	@echo "make formatacao-check - vericacao da formatacao do codigo"
+	@echo "make formatacao - verifica e corrige a formatacao do codigo"
+	@echo "make cache - realiza a limpeza do cache"
+	@echo "make ci-backend - execucao da integracao continua"
+	@echo ""
+	@echo "Comandos do docker"
+	@echo "make up - inicializacao do container docker"
+	@echo "make build - contrucao ou reconstrucao da imagem do docker"
+	@echo "make rebuild - reconstrucao das imagens e inicializacao em segundo plano do docker"
+	@echo "make logs - exibicao dos logs do container"
+	@echo "make api-logs - exibicao dos logs gerados da API"
+	@echo "make down - paralizacao e remocao do container"
+	@echo "make status_container - lista o status do container"
+	@echo "make shell_api - abertura de um terminal dentro do container da API"
+	@echo ""
+	@echo "Comandos do banco de dados"
+	@echo "make db-upgrade - aplicacao das migrations pendentes"
+	@echo "make db-downgrade - reverter a ultima migration"
+	@echo "make db-current - mostrar a migration atual"
+	@echo "make db-history - exibicao do historico de migrations"
+	@echo "make db-tables - listagem das tabelas do PostgreSQL"
+	@echo "make db-shell - abrir o terminal do PostgreSQL"
+	@echo "make db-revision MSG='descricao' - geracao de uma nova migration"
+	@echo "make setup-db - inicializacao dos containers e aplicacao das migrations"
+	@echo ""
+	@echo "Comandos do frontend"
+	@echo "make frontend-install - instalar as dependencias"
+	@echo "make frontend-dev - inicializacao do servidor Vite"
+	@echo "make frontend-lint - execucao da analise estatica"
+	@echo "make frontend-lint-fix - corrige automaticamente problemas de lint"
+	@echo "make frontend-formatacao - correcao da formatacao"
+	@echo "make frontend-check - verificacao do lint e da formatacao"
+	@echo "make frontend-check-fix - corrige lint, formatacao e organizacao dos imports"
+	@echo "make frontend-test - execucao dos testes unitarios e de integracao"
+	@echo "make frontend-test-e2e - execucao dos testes E2E"
+	@echo "make frontend-build - geracao do build do frontend"
+	@echo "make ci-frontend - execucao das verificacoes locais do frontend"
+	@echo ""
+	@echo "Comandos gerais"
+	@echo "make check-all - verifica o backend e o frontend"
+	@echo "make up-build - reconstroi e inicializa os containers"
+	@echo "make e2e - executa os testes Playwright"
+
+#backend
+install:
+	@cd $(BACKEND) && poetry install
+
+run:
+	@cd $(BACKEND) && $(UVICORN) app.main:app --reload
+
+teste:
+	@cd $(BACKEND) && $(PYTEST)
+
+teste-verbose:
+	@cd $(BACKEND) && $(PYTEST) -v
+
+lint:
+	@cd $(BACKEND) && $(RUFF) check .
+
+formatacao-check:
+	@cd $(BACKEND) && $(RUFF) format --check .
+
+formatacao:
+	@cd $(BACKEND) && $(RUFF) format .
+
+lint-fix:
+	@cd $(BACKEND) && $(RUFF) check . --fix
+
+ci-backend: formatacao-check lint teste
+
+cache:
+	@cd $(BACKEND) && rm -rf .pytest_cache
+	@cd $(BACKEND) && rm -rf __pycache__
+	@cd $(BACKEND) && find . -type d -name "__pycache__" -prune -exec rm -rf {} +
+
+#docker
+up:
+	$(DOCKER) up -d
+
+build:
+	$(DOCKER) build
+
+rebuild:
+	$(DOCKER) up --build -d --wait
+
+logs:
+	$(DOCKER) logs -f
+
+api-logs:
+	$(DOCKER) logs -f api
+
+down:
+	$(DOCKER) down
+
+status_container:
+	$(DOCKER) ps
+
+shell_api:
+	$(DOCKER) exec api sh
+
+#banco de dados
+db-upgrade:
+	$(DOCKER) exec -T api poetry run alembic upgrade head
+
+db-downgrade:
+	$(DOCKER) exec -T api poetry run alembic downgrade -1
+
+db-current:
+	$(DOCKER) exec -T api poetry run alembic current
+
+db-history:
+	$(DOCKER) exec -T api poetry run alembic history
+
+db-tables:
+	$(DOCKER) exec -T db sh -c 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -c "\dt"'
+
+db-shell:
+	$(DOCKER) exec db sh -c 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"'
+
+db-revision:
+	@test -n "$(MSG)" || (echo "Informe MSG"; exit 1)
+	MSYS_NO_PATHCONV=1 $(DOCKER) run --rm -v "$(CURDIR)/backend/alembic:/app/alembic" api poetry run alembic revision --autogenerate -m "$(MSG)"
+
+setup-db:
+	$(DOCKER) up -d --build --wait db api
+	$(DOCKER) exec -T api poetry run alembic upgrade head
+
+#frontend
+frontend-install:
+	npm --prefix $(FRONTEND) ci
+
+frontend-dev:
+	npm --prefix $(FRONTEND) run dev
+
+frontend-lint:
+	npm --prefix $(FRONTEND) run lint
+
+frontend-lint-fix:
+	npm --prefix $(FRONTEND) run lint:fix
+
+frontend-formatacao:
+	npm --prefix $(FRONTEND) run format
+
+frontend-check:
+	npm --prefix $(FRONTEND) run check
+
+frontend-check-fix:
+	npm --prefix $(FRONTEND) run check:fix
+
+frontend-test:
+	npm --prefix $(FRONTEND) run test
+
+frontend-test-e2e:
+	npm --prefix $(FRONTEND) run test:e2e
+
+frontend-build:
+	npm --prefix $(FRONTEND) run build
+
+ci-frontend: frontend-check frontend-test frontend-build
+
+#comandos gerais
+check-all: ci-backend ci-frontend
+
+up-build: rebuild
+
+e2e: frontend-test-e2e
+
+test: teste
+
+ps: status_container

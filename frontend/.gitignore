@@ -1,0 +1,15 @@
+#Dependências
+node_modules/
+
+#Build
+dist/
+
+#Playwright
+playwright-report/
+test-results/
+playwright/.cache/
+
+#Banco de dados local
+*.db
+*.sqlite
+*.sqlite3
